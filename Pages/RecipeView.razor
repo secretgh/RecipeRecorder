@@ -1,0 +1,47 @@
+﻿@page "/RecipeView"
+@using RecipeRecorder.Models
+<h1>Recipe View</h1>
+<div class="leftpane" >
+    <EditForm Model="@Model" OnSubmit="@Submit" >
+        <!-- Recipe Name-->
+        <!-- Tags -->
+        <!-- Recipe Description -->
+        <!-- List of Ingredients -->
+        <!-- List of Instructions -->
+        <InputText @bind-Value="Model.name" style="margin:5px" placeholder="Add Recipe Name"/>
+        <br/>
+        <InputText @bind-Value="Model.description" style="margin:5px" placeholder="Add Description" />
+        <br />
+
+    </EditForm>
+</div>
+
+<div class="rightpane">
+    <h3>Model Data:</h3>
+    Recipe id: @Model.id
+    <br />
+    Recipe Name: "@Model.name"
+    <br />
+    Recipe Description: "@Model.description"
+    <br />
+    Recipe Tag Count: @Model.tags.Count
+    <br />
+    Recipe Ingredient Count: @Model.ingredients.Count
+    <br />
+    Recipe Step Count: @Model.steps.Count
+</div>
+
+@code {
+    public Recipe Model { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Model = new Recipe();
+    }
+
+    private void Submit()
+    {
+        
+    }
+}

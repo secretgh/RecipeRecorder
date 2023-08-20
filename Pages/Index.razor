@@ -1,0 +1,49 @@
+﻿@page "/"
+@inject NavigationManager nav
+<PageTitle>Recipe Home</PageTitle>
+
+<h1>Home</h1>
+
+Welcome to your recipes.
+
+<div style="justify-content:flex-start">
+    <nav class="flex-column">
+        <div class ="nav-item px-3">
+            <NavLink class="nav-link" href="Counter">
+                <span class="oi oi-plus" aria-hidden="true"></span>
+                    Counter
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="FetchData">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>
+                    Fetch Data
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+<!-- List of cards -->
+<button onclick="@AddRecipe" class="form-control">Add Recipe</button>
+<br />
+<br />
+<div id="divRecipes" class="flex-column">
+    <!-- Placeholder  area-->
+    <RecipeSummary Name="Bulgogi" Description="Korean marinated beef stir fry" Tags="@ExampleTags()" />
+    <RecipeSummary />
+</div>
+
+@code {
+    public List<string> ExampleTags()
+    {
+        List<string> exampleTag = new List<string>();
+        exampleTag.Add("Sweet");
+        exampleTag.Add("Spicy");
+        return exampleTag;
+    }
+
+    public void AddRecipe()
+    {
+        nav.NavigateTo("/RecipeView");
+    }
+}

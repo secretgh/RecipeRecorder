@@ -1,0 +1,13 @@
+{
+	"nodes":[
+		{"id":"e35609e79925bf65","x":-180,"y":-280,"width":250,"height":120,"color":"4","type":"text","text":"Recipes\n ID\n Name\n Description\n "},
+		{"id":"3a8a9daeed0a1e80","x":-430,"y":0,"width":250,"height":200,"color":"#ffffff","type":"text","text":"Recipe Ingredients\nID\nRecipeID\nIngredientDesc\nQuantity\nQuantityDesc"},
+		{"id":"d3b16a48641df32a","x":-160,"y":0,"width":250,"height":120,"color":"#ffffff","type":"text","text":"Recipe Steps\nID\nRecipeID\nStep"},
+		{"id":"c011a6b407853abf","x":120,"y":0,"width":250,"height":120,"color":"#ffffff","type":"text","text":"Recipe Tags\nID\nRecipeID\nTag"}
+	],
+	"edges":[
+		{"id":"7b7a208bd5f975cd","fromNode":"e35609e79925bf65","fromSide":"bottom","toNode":"3a8a9daeed0a1e80","toSide":"top","color":"4"},
+		{"id":"50634230ce7f77bd","fromNode":"e35609e79925bf65","fromSide":"bottom","toNode":"d3b16a48641df32a","toSide":"top","color":"4"},
+		{"id":"6a58e81b53068ff1","fromNode":"e35609e79925bf65","fromSide":"bottom","toNode":"c011a6b407853abf","toSide":"top","color":"4"}
+	]
+}

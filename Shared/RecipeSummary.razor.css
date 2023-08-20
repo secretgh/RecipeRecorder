@@ -1,0 +1,29 @@
+﻿.root {
+    color: black;
+    border-radius: 15px;
+    padding: 8px;
+    border: 2px solid black;
+    width: 400px;
+    margin-top: 10px;
+    /*
+        transition: transform .7s ease-in-out;
+    */
+}
+
+.root:hover {
+    background-color: rgba(0,0,0,.5);
+    border-color: rgba(0,0,0,.5);
+    color: white
+    /*
+transform: rotate(360deg);
+*/
+}
+
+.Tag {
+    border-radius: 5px;
+    border: 1px solid black;
+    padding: 3px;
+    margin-right: 3px;
+    color: black;
+    background-color: white;
+}

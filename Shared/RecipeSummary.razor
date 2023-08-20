@@ -1,0 +1,37 @@
+﻿<!-- Recipe name, Description, Tags -->
+@inject NavigationManager NavManager
+
+ <div class="root" onclick="@OnClick">
+     <h2>@Name</h2>
+    <p>@Description</p>
+     <div>
+        @{
+            foreach(string tag in Tags)
+            {
+                <span class="Tag">@tag</span>
+            }
+         }
+     </div>
+ </div>
+
+@code {
+    [Parameter]
+    public string Name { get; set; }
+    [Parameter]
+    public string Description { get; set; } 
+    [Parameter]
+    public List<string> Tags { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (Name == null) Name = "Recipe Name";
+        if (Description == null) Description = "Description";
+        if (Tags == null) { Tags = new List<string>(); Tags.Add("Tag1"); }
+    }
+
+    private void OnClick()
+    {
+        NavManager.NavigateTo("/RecipeView");
+    }
+}

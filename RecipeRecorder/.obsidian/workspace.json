@@ -1,0 +1,157 @@
+{
+  "main": {
+    "id": "a2e2836019735b89",
+    "type": "split",
+    "children": [
+      {
+        "id": "94408546d2ea18e4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6acb1803556a1482",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "ER Diagram.canvas",
+                "viewState": {
+                  "x": -30,
+                  "y": -40,
+                  "zoom": -0.3698487255125885
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "df792b3831da3579",
+    "type": "split",
+    "children": [
+      {
+        "id": "104803346f53c2ed",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1c2730356f0f4e33",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "5201de403d941eeb",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "d50ee5df6d145ffd",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "461a6c7cf49c3e9e",
+    "type": "split",
+    "children": [
+      {
+        "id": "6f696ab2145b1b96",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "786dfbbb3d7125d7",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "ER Diagram.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "b3bdaa57c66bd0b2",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "ER Diagram.canvas",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "621beaf859e84b52",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "5a6100e5778ca05d",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "ER Diagram.canvas"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "1c2730356f0f4e33",
+  "lastOpenFiles": [
+    "TODO.md",
+    "ER Diagram.canvas"
+  ]
+}

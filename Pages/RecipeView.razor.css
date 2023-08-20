@@ -1,0 +1,11 @@
+﻿.leftpane {
+    width: 50%;
+    position: absolute;
+    left: 0;
+}
+
+.rightpane {
+    width: 50%;
+    position: absolute;
+    right: 0;
+}

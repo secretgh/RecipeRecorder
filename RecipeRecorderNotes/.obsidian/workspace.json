@@ -11,14 +11,11 @@
             "id": "6acb1803556a1482",
             "type": "leaf",
             "state": {
-              "type": "canvas",
+              "type": "markdown",
               "state": {
-                "file": "ER Diagram.canvas",
-                "viewState": {
-                  "x": -30,
-                  "y": -40,
-                  "zoom": -0.3698487255125885
-                }
+                "file": "TODO.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -88,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ER Diagram.canvas",
+                "file": "TODO.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -105,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ER Diagram.canvas",
+                "file": "TODO.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -128,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ER Diagram.canvas"
+                "file": "TODO.md"
               }
             }
           }
@@ -151,7 +148,7 @@
   },
   "active": "1c2730356f0f4e33",
   "lastOpenFiles": [
-    "TODO.md",
-    "ER Diagram.canvas"
+    "ER Diagram.canvas",
+    "TODO.md"
   ]
 }

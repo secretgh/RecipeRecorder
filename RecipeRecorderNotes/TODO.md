@@ -1,6 +1,6 @@
- -  Implement a recipe Tag input w/ dynamic list of labels/spans and a text input with function on enter
+ -  ~~Implement a recipe Tag input w/ dynamic list of labels/spans and a text input with function on enter
  
- - Implement a dynamic Card system for both ingredients and steps
+ - Implement a dynamic Card system for both ingredients and steps (IN PROGRESS)
 
  - Add the submit logic for adding record to database / need to make stored procedure for inserting data
 

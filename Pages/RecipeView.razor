@@ -48,29 +48,59 @@
                 }
             }
         </div>
+        <br />
+        <div class="w3-card" style="width: auto; display: flex; flex-direction: column; border-radius: 5px; border: 1px solid black; margin:5px; padding: 2px;">
+            Recipe Step @(Model.steps.Count+1):
+            <div>
+                <InputText @bind-Value="step.description" style="width: 400px; height: 40px;" placeholder="Instruction go here" @onkeyup="StepEnterKeyPressed"/>
+            </div>
+            <button type="button" @onclick="AddStep" style="border-radius: 5px; border: 1px solid black; background-color: white;">Add Recipe Step</button>
+        </div>
+        <h4 style="margin: 5px">Recipe Steps:</h4>
+        <div style="display:flex; flex-direction: column;">
+            @{
+                int stepIndex = 1;
+                foreach (Step s in Model.steps)
+                {
+                    <div class="w3-card" style="width: 202.5px; border-radius: 5px; border: 1px solid black; margin-left:5px; margin-top: 5px; padding: 2px;">@stepIndex - @s.description</div>
+                    stepIndex++;
+                }
+            }
+        </div>
 
+        <br />
+        <br />
+
+        <button type="submit" style="margin:5px; padding: 20px; border-radius: 5px; border: 1px solid black; background-color: white;" @onclick="Submit">Finish</button>
     </EditForm>
 </div>
 
-<div class="rightpane">
-    <h3>Model Data:</h3>
-    Recipe id: @Model.id
-    <br />
-    Recipe Name: "@Model.name"
-    <br />
-    Recipe Description: "@Model.description"
-    <br />
-    Recipe Tag Count: @Model.tags.Count
-    <br />
-    Recipe Ingredient Count: @Model.ingredients.Count
-    <br />
-    Recipe Step Count: @Model.steps.Count
-</div>
+@{
+    if (debug == true)
+    {
+        <div class="rightpane">
+            <h3>Model Data:</h3>
+            Recipe id: @Model.id
+            <br />
+            Recipe Name: "@Model.name"
+            <br />
+            Recipe Description: "@Model.description"
+            <br />
+            Recipe Tag Count: @Model.tags.Count
+            <br />
+            Recipe Ingredient Count: @Model.ingredients.Count
+            <br />
+            Recipe Step Count: @Model.steps.Count
+        </div>
+    }
+}
 
 @code {
     public Recipe Model { get; set; }
     public string tag { get; set; }
     public Ingredient ingredient { get; set; }
+    public Step step { get; set; }
+    public bool debug = true;
 
     protected override void OnInitialized()
     {
@@ -78,6 +108,7 @@
         Model = new Recipe();
         tag = "";
         ingredient = new Ingredient();
+        step = new Step();
     }
 
     private void TagEnterKeyPressed(KeyboardEventArgs e)
@@ -88,6 +119,16 @@
         }
     }
 
+    private void StepEnterKeyPressed(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter")
+        {
+            AddStep();
+        }
+    }
+
+
+    //TODO: Add validation for each Add... Function
     private void AddTag()
     {
         Model.tags.Add(new Tag(tag));
@@ -100,8 +141,14 @@
         ingredient = new Ingredient();
     }
 
+    private void AddStep()
+    {
+        Model.steps.Add(step);
+        step = new Step();
+    }
+
     private void Submit()
     {
-        
+        //TODO: research how to connect to mssql db from webassembly blazor project, and where to place connectionstring
     }
 }

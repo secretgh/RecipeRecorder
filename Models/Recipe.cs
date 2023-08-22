@@ -41,6 +41,11 @@
     {
         //public int id;
         public string description;
+
+        public Step(string description = "")
+        {
+            this.description = description;
+        }
     }
 
     public class Tag

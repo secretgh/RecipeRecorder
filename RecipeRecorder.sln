@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder", "RecipeRecorder.csproj", "{2391D64E-7D97-48AF-A9E4-CA8BBF7D25A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.Server", "..\RecipeRecorder\Server\RecipeRecorder.Server.csproj", "{3E8A738F-AA68-4945-9D44-ECA76298DDED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.Client", "..\RecipeRecorder\Client\RecipeRecorder.Client.csproj", "{8667B613-A232-472B-A244-45223A2E5A28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.Shared", "..\RecipeRecorder\Shared\RecipeRecorder.Shared.csproj", "{B3EEA5A6-06BA-4679-99A0-ABFEBB5DBC6A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2391D64E-7D97-48AF-A9E4-CA8BBF7D25A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2391D64E-7D97-48AF-A9E4-CA8BBF7D25A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2391D64E-7D97-48AF-A9E4-CA8BBF7D25A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2391D64E-7D97-48AF-A9E4-CA8BBF7D25A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E8A738F-AA68-4945-9D44-ECA76298DDED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E8A738F-AA68-4945-9D44-ECA76298DDED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E8A738F-AA68-4945-9D44-ECA76298DDED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E8A738F-AA68-4945-9D44-ECA76298DDED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8667B613-A232-472B-A244-45223A2E5A28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8667B613-A232-472B-A244-45223A2E5A28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8667B613-A232-472B-A244-45223A2E5A28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8667B613-A232-472B-A244-45223A2E5A28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3EEA5A6-06BA-4679-99A0-ABFEBB5DBC6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3EEA5A6-06BA-4679-99A0-ABFEBB5DBC6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3EEA5A6-06BA-4679-99A0-ABFEBB5DBC6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3EEA5A6-06BA-4679-99A0-ABFEBB5DBC6A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

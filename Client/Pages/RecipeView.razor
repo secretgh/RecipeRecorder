@@ -1,5 +1,4 @@
 ﻿@page "/RecipeView"
-@using RecipeRecorder.Models
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 <h1>Recipe View</h1>
@@ -131,20 +130,29 @@
     //TODO: Add validation for each Add... Function
     private void AddTag()
     {
-        Model.tags.Add(new Tag(tag));
-        tag = "";
+        if (tag != "")
+        {
+            Model.tags.Add(new Tag(tag));
+            tag = "";
+        }    
     }
 
     private void AddIngredient()
     {
-        Model.ingredients.Add(ingredient);
-        ingredient = new Ingredient();
+        if(ingredient.description != "" && ingredient.amount != 0)
+        {
+            Model.ingredients.Add(ingredient);
+            ingredient = new Ingredient();
+        }
     }
 
     private void AddStep()
     {
-        Model.steps.Add(step);
-        step = new Step();
+        if(step.description != "")
+        {
+            Model.steps.Add(step);
+            step = new Step();
+        }            
     }
 
     private void Submit()

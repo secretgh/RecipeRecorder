@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject NavigationManager nav
+@inject IRecipeService RecipeService
+
 <PageTitle>Recipe Home</PageTitle>
 
 <h1>Home</h1>
@@ -28,12 +30,25 @@ Welcome to your recipes.
 <br />
 <br />
 <div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
-    <!-- Placeholder  area-->
+    <!-- Placeholder  area
     <RecipeSummary Name="Bulgogi" Description="Korean marinated beef stir fry" Tags="@ExampleTags()" />
     <RecipeSummary />
+    -->
+    @{
+        foreach(Recipe r in recipes) {
+            <RecipeSummary Name="@(r.name)" Description="@(r.description)" Tags="@(r.tags)" />
+        }
+    }
 </div>
 
 @code {
+    public List<Recipe> recipes = new List<Recipe>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        recipes = await RecipeService.GetRecipes();
+    }
+
     public List<string> ExampleTags()
     {
         List<string> exampleTag = new List<string>();

@@ -1,11 +1,19 @@
+global using RecipeRecorder.Server;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+//TODO: Figure out how to add context to recipe controller
+builder.Services.AddDbContext<DataContext>(options =>
+{ 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("defaultConnection"));
+});
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
 
 var app = builder.Build();
 

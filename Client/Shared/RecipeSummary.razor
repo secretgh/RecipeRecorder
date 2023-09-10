@@ -16,6 +16,8 @@
 
 @code {
     [Parameter]
+    public int id { get; set; }
+    [Parameter]
     public string Name { get; set; }
     [Parameter]
     public string Description { get; set; } 
@@ -32,6 +34,6 @@
 
     private void OnClick()
     {
-        NavManager.NavigateTo("/RecipeView");
+        NavManager.NavigateTo($"/RecipeView/{id}");
     }
 }

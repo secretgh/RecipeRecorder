@@ -36,7 +36,7 @@ Welcome to your recipes.
     -->
     @{
         foreach(Recipe r in recipes) {
-            <RecipeSummary Name="@(r.name)" Description="@(r.description)" Tags="@(r.tags)" />
+            <RecipeSummary id="@(r.id)" Name="@(r.name)" Description="@(r.description)" Tags="@(r.tags)" />
         }
     }
 </div>

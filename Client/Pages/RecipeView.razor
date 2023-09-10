@@ -1,81 +1,92 @@
 ﻿@page "/RecipeView"
+@page "/RecipeView/{id:int}"
+@inject IRecipeService RecipeService
+@inject NavigationManager NavManager
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 <h1>Recipe View</h1>
 <div class="leftpane" >
-    <EditForm Model="@Model" >
-        <!-- Recipe Name-->
-        <!-- Tags -->
-        <!-- Recipe Description -->
-        <!-- List of Ingredients -->
-        <!-- List of Instructions -->
-        <InputText @bind-Value="Model.name" style="margin:5px" placeholder="Add Recipe Name"/>
-        <br/>
-        <InputText @bind-Value="Model.description" style="margin:5px" placeholder="Add Description" />
-        <br />
-        <InputText @bind-Value="tag" style="margin:5px" placeholder="Add Tag" @onkeyup="TagEnterKeyPressed"/> 
-        <button type="button" @onclick="AddTag" style="border-radius: 5px; border: 1px solid black; background-color: white;">+</button>
-        <div style="display:flex; flex-direction:row;">
-            @{
-                foreach(Tag tag in Model.tags){
-                    //Make editible
-                    <div class="w3-card" style="border-radius: 5px; border: 1px solid black; margin:2px; padding: 2px;">@tag.description</div>
-                }
-            }
-        </div>
-        <br />
-        <div class="w3-card" style="width: auto; display: flex; flex-direction: column; border-radius: 5px; border: 1px solid black; margin:5px; padding: 2px;">
-            New Ingredient: 
-            <div>
-                <InputText @bind-Value="ingredient.name" placeholder="Ingredient Name" /> 
-                <InputText @bind-Value="ingredient.description" style="width:400px" placeholder="(Optional) Description ex: chopped / diced" />
-            </div>
-            <div>
-                <InputNumber @bind-Value="ingredient.amount" placeholder="Amount"/>
-                <InputText @bind-Value="ingredient.amountDescription" placeholder="Description of quantity" />
-            </div>
-            <button type="button" @onclick="AddIngredient" style="border-radius: 5px; border: 1px solid black; background-color: white;">Add Ingredient</button>
-        </div>
-        <h4 style="margin: 5px">
-            Ingredients:
-        </h4>
-        <div style="display:flex; flex-direction: column;">
-            @{
-                foreach (Ingredient i in Model.ingredients)
-                {
-                    <div class="w3-card" style="width: 202.5px; border-radius: 5px; border: 1px solid black; margin-left:5px; margin-top: 5px; padding: 2px;">@i.name @i.description : @i.amount @i.amountDescription</div>
-                }
-            }
-        </div>
-        <br />
-        <div class="w3-card" style="width: auto; display: flex; flex-direction: column; border-radius: 5px; border: 1px solid black; margin:5px; padding: 2px;">
-            Recipe Step @(Model.steps.Count+1):
-            <div>
-                <InputText @bind-Value="step.description" style="width: 400px; height: 40px;" placeholder="Instruction go here" @onkeyup="StepEnterKeyPressed"/>
-            </div>
-            <button type="button" @onclick="AddStep" style="border-radius: 5px; border: 1px solid black; background-color: white;">Add Recipe Step</button>
-        </div>
-        <h4 style="margin: 5px">Recipe Steps:</h4>
-        <div style="display:flex; flex-direction: column;">
-            @{
-                int stepIndex = 1;
-                foreach (Step s in Model.steps)
-                {
-                    <div class="w3-card" style="width: 202.5px; border-radius: 5px; border: 1px solid black; margin-left:5px; margin-top: 5px; padding: 2px;">@stepIndex - @s.description</div>
-                    stepIndex++;
-                }
-            }
-        </div>
+    @{
+        if (_render)
+        {
+            <EditForm Model="Model">
+            <!-- Recipe Name-->
+            <InputText @bind-Value="Model.name" style="margin:5px" placeholder="Add Recipe Name"/>
+            <br/>
+            <!-- Recipe Description -->
+            <InputText @bind-Value="Model.description" style="margin:5px" placeholder="Add Description" />
+            <br />
 
-        <br />
-        <br />
+            <!-- Tags -->
+            <InputText @bind-Value="tag" style="margin:5px" placeholder="Add Tag" @onkeyup="TagEnterKeyPressed"/> 
+            <button type="button" @onclick="AddTag" style="border-radius: 5px; border: 1px solid black; background-color: white;">+</button>
+            <div style="display:flex; flex-direction:row;">
+                @{
+                    foreach(Tag tag in Model.tags){
+                        //Make editible
+                        <div class="w3-card" style="border-radius: 5px; border: 1px solid black; margin:2px; padding: 2px;">@tag.description</div>
+                    }
+                }
+            </div>
+            <br />
 
-        <button type="submit" style="margin:5px; padding: 20px; border-radius: 5px; border: 1px solid black; background-color: white;" @onclick="Submit">Finish</button>
-    </EditForm>
+            <!-- List of Ingredients -->
+            <div class="w3-card" style="width: auto; display: flex; flex-direction: column; border-radius: 5px; border: 1px solid black; margin:5px; padding: 2px;">
+                New Ingredient: 
+                <div>
+                    <InputText @bind-Value="ingredient.name" placeholder="Ingredient Name" /> 
+                    <InputText @bind-Value="ingredient.description" style="width:400px" placeholder="(Optional) Description ex: chopped / diced" />
+                </div>
+                <div>
+                    <InputNumber @bind-Value="ingredient.amount" placeholder="Amount"/>
+                    <InputText @bind-Value="ingredient.amountDescription" placeholder="Description of quantity" />
+                </div>
+                <button type="button" @onclick="AddIngredient" style="border-radius: 5px; border: 1px solid black; background-color: white;">Add Ingredient</button>
+            </div>
+            <h4 style="margin: 5px">
+                Ingredients:
+            </h4>
+            <div style="display:flex; flex-direction: column;">
+                @{
+                    foreach (Ingredient i in Model.ingredients)
+                    {
+                        <div class="w3-card" style="width: 202.5px; border-radius: 5px; border: 1px solid black; margin-left:5px; margin-top: 5px; padding: 2px;">@i.name @i.description : @i.amount @i.amountDescription</div>
+                    }
+                }
+            </div>
+            <br />
+
+            <!-- List of Instructions -->
+            <div class="w3-card" style="width: auto; display: flex; flex-direction: column; border-radius: 5px; border: 1px solid black; margin:5px; padding: 2px;">
+                Recipe Step @(Model.steps.Count+1):
+                <div>
+                    <InputText @bind-Value="step.description" style="width: 400px; height: 40px;" placeholder="Instruction go here" @onkeyup="StepEnterKeyPressed"/>
+                </div>
+                <button type="button" @onclick="AddStep" style="border-radius: 5px; border: 1px solid black; background-color: white;">Add Recipe Step</button>
+            </div>
+            <h4 style="margin: 5px">Recipe Steps:</h4>
+            <div style="display:flex; flex-direction: column;">
+                @{
+                    int stepIndex = 1;
+                    foreach (Step s in Model.steps)
+                    {
+                        <div class="w3-card" style="width: 202.5px; border-radius: 5px; border: 1px solid black; margin-left:5px; margin-top: 5px; padding: 2px;">@stepIndex - @s.description</div>
+                        stepIndex++;
+                    }
+                }
+            </div>
+
+            <br />
+            <br />
+
+            <button type="button" style="margin:5px; padding: 20px; border-radius: 5px; border: 1px solid black; background-color: white;" @onclick="Submit">Finish</button>
+        </EditForm>
+        }
+    }
 </div>
 
 @{
-    if (debug == true)
+    if (debug == true && Model != null)
     {
         <div class="rightpane">
             <h3>Model Data:</h3>
@@ -95,19 +106,37 @@
 }
 
 @code {
-    public Recipe Model { get; set; }
+    [Parameter]
+    public int? id { get; set; }
+
+    private bool _render = false;
+    public Recipe? Model { get; set; }
     public string tag { get; set; }
     public Ingredient ingredient { get; set; }
     public Step step { get; set; }
     public bool debug = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         base.OnInitialized();
-        Model = new Recipe();
-        tag = "";
-        ingredient = new Ingredient();
-        step = new Step();
+        Console.WriteLine("DEBUG ID: " + id.ToString());
+
+        if(id != null)
+        {
+            Model = await RecipeService.GetRecipe(id.GetValueOrDefault());
+            tag = "";
+            ingredient = new Ingredient();
+            step = new Step();
+        }
+        else
+        {
+            Model = new Recipe();
+            tag = "";
+            ingredient = new Ingredient();
+            step = new Step();
+        }
+
+        _render = true;
     }
 
     private void TagEnterKeyPressed(KeyboardEventArgs e)
@@ -139,7 +168,7 @@
 
     private void AddIngredient()
     {
-        if(ingredient.description != "" && ingredient.amount != 0)
+        if(ingredient.name != "" && ingredient.amount != 0)
         {
             Model.ingredients.Add(ingredient);
             ingredient = new Ingredient();
@@ -155,8 +184,17 @@
         }            
     }
 
-    private void Submit()
+    private async void Submit()
     {
-        //TODO: research how to connect to mssql db from webassembly blazor project, and where to place connectionstring
+        //TODO validate Model data
+        if(id == null)
+        {
+            await RecipeService.CreateRecipe(Model);
+        }
+        else
+        {
+            await RecipeService.UpdateRecipe(Model);
+        }
+        NavManager.NavigateTo("");
     }
 }

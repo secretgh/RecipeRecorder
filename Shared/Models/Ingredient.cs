@@ -14,12 +14,12 @@ namespace RecipeRecorder.Shared
         public float amount { get; set; }
         public string amountDescription { get; set; }
 
-        public Ingredient(string name = "", string description = "", float amount = 0, string amountDesc = "")
+        public Ingredient(string name = "", string description = "", float amount = 0, string amountDescription = "")
         {
             this.name = name;
             this.description = description;
             this.amount = amount;
-            this.amountDescription = amountDesc;
+            this.amountDescription = amountDescription;
         }
     }
 }

@@ -8,11 +8,12 @@ namespace RecipeRecorder.Shared
 {
     public class Step
     {
-        //public int id;
+        public int id { get; set; }
         public string description { get; set; }
 
-        public Step(string description = "")
+        public Step(int id = -1,string description = "")
         {
+            this.id = id;
             this.description = description;
         }
     }

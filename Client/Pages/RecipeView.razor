@@ -161,7 +161,7 @@
     {
         if (tag != "")
         {
-            Model.tags.Add(new Tag(tag));
+            Model.tags.Add(new Tag { description = tag });
             tag = "";
         }    
     }

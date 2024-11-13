@@ -1,0 +1,1 @@
+dotnet ef dbcontext scaffold 'Data Source=localhost,1433; database=DEV; User ID=sa;Password=P@ssword!;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False' Microsoft.EntityFrameworkCore.SqlServer --data-annotations --context-dir DataBaseContext --output-dir Models --force

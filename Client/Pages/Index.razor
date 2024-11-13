@@ -1,64 +1,59 @@
-﻿@page "/"
-@inject NavigationManager nav
+﻿@inject NavigationManager nav
 @inject IRecipeService RecipeService
 
-<PageTitle>Recipe Home</PageTitle>
+@page "/"
 
-<h1>Home</h1>
+<h3>Recipe Collection</h3>
+@if (!_render)
+{
+    <div class="spinner-border" role="status" style="margin:5px;">
+        <span class="sr-only" style="padding-left: 10px;">Loading...</span>
+    </div>
+}
+else
+{
+    if (isDBUp)
+    {
+        <div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
+            <!-- Placeholder  area
+            <RecipeSummary Name="Bulgogi" Description="Korean marinated beef stir fry" Tags="@ExampleTags()" />
+            <RecipeSummary /> 
+            -->
+            @if (recipes.Count == 0)
+            {
+                <label>No Data</label>
+            }
+            else
+            {
 
-Welcome to your recipes.
-
-<div style="justify-content:flex-start">
-    <nav class="flex-column">
-        <div class ="nav-item px-3">
-            <NavLink class="nav-link" href="Counter">
-                <span class="oi oi-plus" aria-hidden="true"></span>
-                    Counter
-            </NavLink>
+                foreach (Recipe r in recipes)
+                {
+                    <RecipeSummary id="@(r.Id)" Name="@(r.RecipeName)" Description="@(r.RecipeDesc)" Tags="@(r.RecipeTags)" />
+                }
+            }
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="FetchData">
-                <span class="oi oi-list-rich" aria-hidden="true"></span>
-                    Fetch Data
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-<!-- List of cards -->
-<button onclick="@AddRecipe" class="form-control">Add Recipe</button>
-<br />
-<br />
-<div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
-    <!-- Placeholder  area
-    <RecipeSummary Name="Bulgogi" Description="Korean marinated beef stir fry" Tags="@ExampleTags()" />
-    <RecipeSummary />
-    -->
-    @{
-        foreach(Recipe r in recipes) {
-            <RecipeSummary id="@(r.id)" Name="@(r.name)" Description="@(r.description)" Tags="@(r.tags)" />
-        }
     }
-</div>
+    else
+    {
+        <label>Database is down.</label>
+    }
+}
 
 @code {
     public List<Recipe> recipes = new List<Recipe>();
-
+    private bool _render = false;
+    private bool isDBUp = false;
     protected override async Task OnInitializedAsync()
     {
-        recipes = await RecipeService.GetRecipes();
-    }
+        isDBUp = await RecipeService.TestConnection();
 
-    public List<string> ExampleTags()
-    {
-        List<string> exampleTag = new List<string>();
-        exampleTag.Add("Sweet");
-        exampleTag.Add("Spicy");
-        return exampleTag;
-    }
+        if (isDBUp)
+        {
+            recipes = await RecipeService.GetRecipes();
+        }
 
-    public void AddRecipe()
-    {
-        nav.NavigateTo("/RecipeView");
+        await base.OnInitializedAsync();
+        _render = true;
+        StateHasChanged();
     }
 }

@@ -7,18 +7,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace RecipeRecorder.Shared;
 
-[Table("Ingredient")]
-public partial class Ingredient
+public partial class RecipeTag
 {
     [Key]
     [Column("ID")]
     public int Id { get; set; }
 
-    [StringLength(50)]
+    [Column("RecipeID")]
+    public int RecipeId { get; set; }
+
+    [StringLength(40)]
     [Unicode(false)]
-    public string IngredientName { get; set; } = null!;
+    public string Tag { get; set; } = null!;
 
     [JsonIgnore]
-    [InverseProperty("Ing")]
-    public virtual List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+    [ForeignKey("RecipeId")]
+    [InverseProperty("RecipeTags")]
+    public virtual Recipe? Recipe { get; set; } = null!;
 }

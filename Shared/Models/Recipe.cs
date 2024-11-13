@@ -1,23 +1,31 @@
-﻿namespace RecipeRecorder.Shared
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+namespace RecipeRecorder.Shared;
+
+public partial class Recipe
 {
-    public class Recipe
-    {
-        public int id { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public List<Tag> tags { get; set; }
-        public List<Ingredient> ingredients { get; set; }
-        public List<Step> steps { get; set; }
+    [Key]
+    [Column("ID")]
+    public int Id { get; set; }
 
-        public Recipe(int id = 0, string name = "", string description = "", 
-            List<Tag>? tags = null, List<Ingredient>? ingredients = null, List<Step>? steps = null) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.tags = tags == null ? new List<Tag>() : tags;
-            this.ingredients = ingredients == null ? new List<Ingredient>() : ingredients;
-            this.steps = steps == null ? new List<Step>() : steps;
-        }
-    }
+    [StringLength(50)]
+    [Unicode(false)]
+    public string RecipeName { get; set; } = null!;
 
+    [StringLength(255)]
+    [Unicode(false)]
+    public string? RecipeDesc { get; set; }
+
+    [InverseProperty("Recipe")]
+    public virtual List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+
+    [InverseProperty("Recipe")]
+    public virtual List<RecipeStep> RecipeSteps { get; set; } = new List<RecipeStep>();
+    
+    [InverseProperty("Recipe")]
+    public virtual List<RecipeTag> RecipeTags { get; set; } = new List<RecipeTag>();
 }

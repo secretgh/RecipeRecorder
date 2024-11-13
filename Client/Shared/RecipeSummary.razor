@@ -1,18 +1,39 @@
 ﻿<!-- Recipe name, Description, Tags -->
 @inject NavigationManager NavManager
 
- <div class="root" onclick="@OnClick">
-     <h2>@Name</h2>
-    <p>@Description</p>
-     <div>
+<style>
+    sl-card::part(base) {
+        background: var(--sl-color-neutral-0);
+    }
+
+    sl-card::part(base):hover {
+        background: rgba(11, 155, 227, 0.1);
+        border-color: rgba(11, 155, 227, 0.5);
+    }
+
+    sl-card::part(base):active {
+        background: rgba(65, 139, 176, 0.2);
+            border-color: rgba(65, 139, 176, 1);
+    }
+
+</style>
+
+ <sl-card onclick="@OnClick">
+     <div slot="header">
+        @Name
+     </div>
+    <div>
+        @Description
+    </div>
+     <div slot="footer">
         @{
-            foreach(Tag tag in Tags)
+            foreach(RecipeTag tag in Tags)
             {
-                <span class="Tag">@tag.description</span>
+                <sl-tag pill>@tag.Tag</sl-tag>
             }
          }
      </div>
- </div>
+ </sl-card>
 
 @code {
     [Parameter]
@@ -22,14 +43,14 @@
     [Parameter]
     public string Description { get; set; } 
     [Parameter]
-    public List<Tag> Tags { get; set; }
+    public List<RecipeTag> Tags { get; set; }
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
         if (Name == null) Name = "Recipe Name";
         if (Description == null) Description = "Description";
-        if (Tags == null) { Tags = new List<Tag>(); }
+        if (Tags == null) { Tags = new List<RecipeTag>(); }
     }
 
     private void OnClick()

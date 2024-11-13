@@ -1,14 +1,7 @@
 USE [DEV]
 GO
 
-/****** Object:  StoredProcedure [dbo].[GetTags]    Script Date: 2023-09-12 9:15:24 PM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-Create procedure [dbo].[GetTags]
+Create or alter procedure [dbo].[GetTags]
 @recipeID int
 as 
 begin
@@ -16,31 +9,33 @@ begin
 end
 GO
 
-
-Create procedure [dbo].[GetSteps]
+Create or alter procedure [dbo].[GetSteps]
 @recipeID int
 as 
 begin
-	Select ID, Step from RecipeSteps where RecipeID = @recipeID
+	Select ID, Step, SubText from RecipeSteps where RecipeID = @recipeID
 end
 GO
 
-Create procedure [dbo].[GetRecipes]
+Create or alter procedure [dbo].[GetRecipes]
 as 
 begin
 	Select * from Recipes
 end
 GO
 
-Create procedure [dbo].[GetIngredients]
+create or alter procedure [dbo].[GetRecipeIngredients]
 @recipeID int
 as 
 begin
-	Select ID, IngredientDesc, Quantity, QuantityDesc  from RecipeIngredients where RecipeID = @recipeID
+	Select a.IngID, a.RecipeID, b.IngredientName, a.IngredientNameModifier, a.Quantity, a.QuantityDesc  from 
+	RecipeIngredients a 
+	inner join Ingredient b on a.IngID = b.ID
+	where a.RecipeID = @recipeID
 end
 GO
 
-CREATE procedure [dbo].[CreateTag]
+Create or alter procedure [dbo].[CreateTag]
 @recipeID int,
 @tag varchar(255)
 as 
@@ -50,17 +45,18 @@ begin
 end
 GO
 
-CREATE procedure [dbo].[CreateStep]
+Create or alter procedure [dbo].[CreateStep]
 @recipeID int,
-@Step varchar(255)
+@Step varchar(max),
+@SubText varchar(max)
 as 
 begin
-	insert into RecipeSteps values (@recipeID, @Step);
+	insert into RecipeSteps values (@recipeID, @Step, @SubText);
 	select @@identity as id
 end
 GO
 
-CREATE procedure [dbo].[CreateRecipe]
+Create or alter procedure [dbo].[CreateRecipe]
 @name varchar(255),
 @desc varchar(255)
 as 
@@ -70,15 +66,46 @@ begin
 end
 GO
 
-CREATE procedure [dbo].[CreateIngredient]
+create or alter procedure [dbo].[CreateRecipeIngredient]
+@ingID int,
 @recipeID int,
-@name varchar(255),
+@name varchar(50),
 @amount int,
 @amountDesc varchar(255)
 as 
 begin
-	insert into RecipeIngredients values (@recipeID, @name, @amount, @amountDesc);
-	select @@identity as id
+	insert into RecipeIngredients values (@ingID, @recipeID, @name, @amount, @amountDesc);
 end
 GO
 
+create or alter procedure dbo.CreateIngredient
+@name varchar(40)
+as 
+begin
+	insert into Ingredient values(@name);
+	select @@IDENTITY as id
+end
+go
+
+create or alter procedure dbo.GetAllIngredients
+as 
+begin
+select ID, IngredientName from Ingredient;
+end
+go
+
+create or alter procedure dbo.GetFilteredIngredients
+@search varchar(40)
+as
+begin
+	select ID, IngredientName from Ingredient
+	where IngredientName like '%'+@search+'%';
+end
+go
+
+create or alter procedure dbo.DeleteTag
+@id int
+as
+begin
+	Delete from RecipeTags where id = @id
+end;

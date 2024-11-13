@@ -1,0 +1,463 @@
+﻿@page "/RecipeEdit"
+@page "/RecipeEdit/{id:int}"
+@inject IRecipeService RecipeService
+@inject NavigationManager NavManager
+@inject IJSRuntime JS
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<PageTitle>Recipe View</PageTitle>
+<div class="leftpan" >
+    @if (_render)
+    {
+         <div>
+            <!-- Recipe Name-->
+            <div style="display: flex; justify-content:space-around; margin:1px;">
+                    <input type="text"
+                       style="width: 500px; height: 100px; text-align:center; border: 0px solid black; font-size: 30px; margin: 5px;field-sizing: content; wrap: hard;"
+                       placeholder="Recipe Name" 
+                       maxlength="50"
+                    @bind-value="Model.RecipeName" />
+            </div>
+
+            <!-- Recipe Description -->
+            <div style="display: flex; justify-content:space-around;">
+                 <textarea
+                        style="width: 300px;  
+                        border: 0px solid black;text-align:center; 
+                        font-size: 15px; resize:none;
+                        overflow:hidden; margin-bottom:5px;
+                        field-sizing: content; wrap: hard;"
+                        maxlength="255"                        
+                        placeholder="Description" 
+                        @bind="Model.RecipeDesc"
+                        @bind:event="oninput" /> 
+            </div>
+            <br />
+            <!-- Tags -->
+            @if (id == null || tag != "")
+            {
+            <div style="display:flex; justify-content:space-around;">
+                <input type="text"
+                    class="w3-card"
+                    @bind-value="tag"
+                    style="width: 80px; height: 30px;
+                    border-radius: 5px; border: 0px solid black; margin:2px; padding: 2px; text-align:center;"
+                    placeholder="Tag" 
+                    @onkeyup="TagEnterKeyPressed" />
+            </div>
+            }
+
+            <div style="display:flex; flex-direction:row; justify-content:center;">
+                @{
+                    if (Model.RecipeTags.Count > 0)
+                    {
+                        foreach (RecipeTag tag in Model.RecipeTags)
+                        {
+                            <sl-tag pill variant="primary" style="margin: 5px;" @onclick="()=>onTagClick(tag)">@tag.Tag</sl-tag>
+                        }
+                        
+                    }
+                }
+            </div>
+            <br />
+
+            <div style="display: flex; justify-content:center; align-items:center;">
+                <hr style="width: 200px; margin:5px; " />
+                <label style="text-align:center; font-size:30px; font-family:Castellar;">Ingredients</label>
+                <hr style="width: 200px;margin:5px;" />
+            </div>
+
+            <br/>
+
+            <!-- List of Ingredients -->
+            <div style="display:flex; flex-direction: column; flex-wrap:wrap; align-items: center;">
+                @{
+                    if (Model.RecipeIngredients.Count > 0)
+                    {
+                        foreach (RecipeIngredient i in Model.RecipeIngredients)
+                        {
+                            <sl-card @onclick="()=>{
+                                OnIngredientClick(i);
+                                }" class="auto" style="width: 400px; font-size:1.25vw; margin: 2px;">
+                                @i.Ing.IngredientName - @i.Quantity @i.QuantityDesc
+                            </sl-card>
+                        }                       
+                    }
+                }
+
+                <button class="btn btn-outline-secondary"
+                style="width:400px; font-family:Castellar; font-size:20px; margin:5px;"
+                @onclick="OnAddIngredientClick">+</button>
+
+                 <sl-dialog open="@IngredientPopupOpen">
+                    <div style="display: flex; flex-direction: column;">
+                        <label for="IAdditions">Ingredient Additional Descriptions (optional):</label>
+
+                        <input id="IAdditions" @bind-value="ingredient.IngredientNameModifier"
+                               style="width:100%; height: 37px; border: 1px solid #bfbfbf; border-radius:5px; text-indent:5px;"
+                               placeholder="ex: rough chopped, diced"
+                        />
+                        <br />
+                        <label>Ingredient Name:</label>
+                        <BlazoredTypeahead  
+                            SearchMethod="SearchIngredients" 
+                            @bind-Value="selectedIngredient"
+                            AddItemOnEmptyResultMethod="AddIngredientLookUp" 
+                            placeholder="Type here to search or hit enter to add new ingredient"
+                        >
+                            <SelectedTemplate>
+                                @if (context != null)
+                                {
+                                    <label>@context.IngredientName</label>
+                                }
+                                else
+                                {
+                                    <label>No Suggestions</label>
+                                }
+                            </SelectedTemplate>
+                            <ResultTemplate>
+                                @if (context != null)
+                                {
+                                    <label>@context.IngredientName</label>
+                                }
+                                else
+                                {
+                                    <label>No Suggestions</label>
+                                }
+                            </ResultTemplate>
+                        </BlazoredTypeahead>
+                
+                        <br />
+                        <label for="IAmount">Amount of ingredient:</label>
+                        <input id="IAmount"  type="text" inputmode="numeric" 
+                            style="width:100%; height: 37px; border:1px solid #bfbfbf; border-radius:5px; text-indent:5px;" @bind-value="ingredient.Quantity" 
+                            />
+                        <br />
+                        <label for="IAmountDesc">Description of amount (optional):</label>
+                        <input id="IAmountDesc" style="width: 100%; height: 37px; border:1px solid #bfbfbf; border-radius:5px; text-indent:5px;"
+                               @bind-value="ingredient.QuantityDesc" placeholder="ex: grams, ml etc" @onkeyup="IngredientEnterKeyPressed" />
+                        <hr />
+                        <sl-card class="auto" style="font-size:1.05vw; margin: 2px;">
+                            <label slot="header">Preview</label>
+                            @(ingredient.IngredientNameModifier == "" ? "[]" : ingredient.IngredientNameModifier) @(selectedIngredient == null ? "[IngredientName]" : selectedIngredient.IngredientName) - @(ingredient.Quantity == 0 ? "[#]" : ingredient.Quantity) @(ingredient.QuantityDesc == "" ? "[grams (optional)]" : ingredient.QuantityDesc)
+                        </sl-card>
+                    </div>
+
+                    <div slot="footer">
+                        <sl-button @onclick="()=>{if(AddIngredient()){OnCloseIngredientClick();}}">Add</sl-button>
+                        <sl-button @onclick="OnCloseIngredientClick">Close</sl-button>
+                </div>
+                </sl-dialog> 
+            </div>
+            <br />
+            <br/>
+            <div style="display: flex; justify-content:center; align-items:center;">
+                <hr style="width: 200px; margin:5px;" />
+                <label style="text-align:center; font-size:30px; font-family:Castellar;">Instructions</label>
+                <hr style="width: 200px;margin:5px;" />
+            </div>
+            <br />
+            <!-- List of Instructions -->
+            <div style="display:flex; flex-direction: column; align-content:center; flex-wrap:wrap;">
+                @{
+                    int stepIndex = 1;
+                    foreach (RecipeStep s in Model.RecipeSteps)
+                    {
+                        <sl-card class="auto" 
+                        style="width: 400px; font-size:15px; margin:2px; word-break:break-word;">
+                            #@stepIndex @s.Step
+                        </sl-card>
+                        stepIndex++;
+                    }
+                }
+
+                <div>
+                    <textarea class="w3-card" style="width: 400px;
+                        border: 0px solid black;text-align:left; text-indent:15px;
+                        font-size: 15px; resize:none; border-radius: 5px;
+                        overflow:hidden; margin-bottom:5px;
+                        field-sizing: content; wrap: hard;"
+                              placeholder="#@(stepIndex.ToString()) Step"
+                              @onkeyup="StepEnterKeyPressed"
+                              @bind="step.Step" 
+                              @bind:event="oninput"
+                              />
+                </div>                    
+                
+            </div>
+
+            <br />
+            <br />
+            @if (id == null)
+            {
+                <div style="display: flex; flex-direction: column; flex-wrap:wrap; align-content: center; border-radius: 5px; margin:5px; padding: 2px;">
+                    <button type="button" class="btn btn-outline-success w3-card" style="font-size:20px;" @onclick="Submit">Add Recipe</button>
+                </div>
+            }
+            else
+            {
+                <div style="display: flex; flex-direction: column; flex-wrap:wrap; align-content: center; border-radius: 5px; margin:5px; padding: 2px;">
+                    <button type="button" class="btn btn-outline-success w3-card" style="font-size:20px;" @onclick="Submit">Update Recipe</button>
+                </div>
+            }
+        </div>
+        <br />
+        <br />
+    }
+    else
+    {
+        <div class="spinner-border" role="status" style="margin:5px;">
+            <span class="sr-only" style="padding-left: 10px;">Loading...</span>
+        </div>
+    }
+</div>
+
+@{
+    if (debug == true && Model != null)
+    {
+        <div class="rightpane">
+            <h3>Model Data:</h3>
+            Recipe id: @Model.Id
+            <br />
+            Recipe Name: "@Model.RecipeName"
+            <br />
+            Recipe Description: "@Model.RecipeDesc"
+            <br />
+            Recipe Tag Count: @Model.RecipeTags.Count
+            <br />
+            Recipe Ingredient Count: @Model.RecipeIngredients.Count
+            <br />
+            Recipe Step Count: @Model.RecipeSteps.Count
+        </div>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? id { get; set; }
+
+    private bool _render = false;
+
+    public Recipe Model;
+    public string tag = "";
+    private RecipeTag? selectedTag;
+    public RecipeIngredient ingredient = new RecipeIngredient();
+    private Ingredient? selectedIngredient = null;
+    public RecipeStep? step;
+
+    public bool debug = false;
+    private bool IngredientPopupOpen = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+
+        if(id != null)
+        {
+            Model = await RecipeService.GetRecipe(id.GetValueOrDefault());
+        }
+        else
+        {
+            Model = new Recipe();
+        }
+
+        tag = "";
+        ingredient = new RecipeIngredient();
+        step = new RecipeStep();
+
+        _render = true;
+    }
+
+    private Lazy<IJSObjectReference> module = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = new(await JS.InvokeAsync<IJSObjectReference>("import", "./js/CustomJavaFunctions.js"));
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module.IsValueCreated)
+        {
+            await module.Value.DisposeAsync();
+        }
+    }
+
+    private void OnAddIngredientClick()
+    {
+        IngredientPopupOpen = true;
+        StateHasChanged();
+    }
+    private void OnCloseIngredientClick()
+    {
+        IngredientPopupOpen = false;
+        StateHasChanged();
+    }
+
+    private void TagEnterKeyPressed(KeyboardEventArgs e)
+    {
+        if(e.Code == "Enter")
+        {
+            AddTag();
+        }
+    }
+
+    private void IngredientEnterKeyPressed(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter")
+        {
+            AddIngredient();
+            OnCloseIngredientClick();
+        }
+    }
+
+    private void StepEnterKeyPressed(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter")
+        {
+            AddStep();
+        }
+    }
+
+    private void AddTag()
+    {
+        if (tag != "")
+        {
+            if(selectedTag != null)
+            {
+                selectedTag = null;
+            }
+            else
+            {
+                Model.RecipeTags.Add(new RecipeTag { Tag = tag, Recipe = Model });
+            }
+            tag = "";
+        }    
+    }
+
+    private async void onTagClick(RecipeTag t)
+    {
+        selectedTag = t;
+        tag = t.Tag;
+        StateHasChanged();
+    }
+
+    private void OnIngredientClick(RecipeIngredient i)
+    {
+        ingredient = i;
+        selectedIngredient = new Ingredient() { IngredientName = i.Ing.IngredientName, Id = i.Ing.Id };
+        OnAddIngredientClick();
+    }
+
+    private bool AddIngredient()
+    {
+        if(selectedIngredient != null && ingredient.Quantity != 0)
+        {
+            if(Model.RecipeIngredients.Exists(i => i.IngId == ingredient.IngId))
+            {
+                int i = Model.RecipeIngredients.IndexOf(ingredient);
+                Model.RecipeIngredients[i] = ingredient;
+            }
+            else
+            {
+                ingredient.IngId = selectedIngredient.Id;
+                ingredient.Ing = selectedIngredient;
+                ingredient.Recipe = Model;
+                Model.RecipeIngredients.Add(ingredient);                
+            }
+
+            ingredient = new RecipeIngredient();
+            selectedIngredient = null;
+            StateHasChanged();
+            return true;
+        }
+        else
+        {
+            module.Value.InvokeVoidAsync("notify", "Your ingredient is missing a name or amount", "danger");
+            return false;
+        }
+    }
+
+    private void AddStep()
+    {
+        step.Step = step.Step.Replace("\n", "");
+        if(step.Step != "")
+        {
+            step.Recipe = Model;
+            Model.RecipeSteps.Add(step);
+            step = new RecipeStep();
+        }
+        else
+        {
+            module.Value.InvokeVoidAsync("notify", "There is no text in your step instruction!", "danger");
+        }
+    }
+
+    private async void Submit()
+    {
+        if (!Valid())
+        {
+            return;    
+        }
+
+        if((await RecipeService.TestConnection()) == false)
+        {
+            await module.Value.InvokeVoidAsync("notify", "The database is currently down!", "danger");
+            return;
+        }
+
+        if(id == null)
+        {
+            await RecipeService.CreateRecipe(Model);
+        }
+        else
+        {
+            await RecipeService.UpdateRecipe(Model);
+        }
+        NavManager.NavigateTo("");
+    }
+
+    private bool Valid()
+    {
+        bool result = true;
+
+        if (Model.RecipeName.Equals(""))
+        {
+            result = false;
+            module.Value.InvokeVoidAsync("notify", "This recipe doesnt have a name!", "danger");
+        }
+
+        if(Model.RecipeSteps.Count == 0)
+        {
+            result = false;
+            module.Value.InvokeVoidAsync("notify", "This recipe has no instructions!", "danger");
+        }
+
+        if(Model.RecipeIngredients.Count == 0)
+        {
+            result = false;
+            module.Value.InvokeVoidAsync("notify", "This recipe has no ingredients!", "danger");
+        }
+
+        return result;
+    }
+
+    private async Task<IEnumerable<Ingredient>> SearchIngredients(string searchText)
+    {
+        var results = await RecipeService.SearchIngredients(searchText);
+        return results;
+    }
+
+    private async Task<Ingredient> AddIngredientLookUp(string searchText)
+    {
+        Ingredient i = await RecipeService.CreateIngredient(new Ingredient { IngredientName = searchText, Id=0 });
+        selectedIngredient = i;
+        ingredient.Ing.IngredientName = i.IngredientName;
+        StateHasChanged();
+        return i;
+    }
+}

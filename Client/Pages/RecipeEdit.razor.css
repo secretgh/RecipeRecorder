@@ -1,0 +1,26 @@
+﻿.leftpane {
+    width: 50%;
+    position: absolute;
+    left: 0;
+}
+
+.rightpane {
+    width: 50%;
+    position: absolute;
+    right: 0;
+}
+
+.sl-toast-stack {
+    bottom: 0;
+    top: auto;
+    left: auto;
+    right: auto;
+}
+
+sl-dialog::part(header-actions) {
+    display: none;
+}
+
+sl-dialog::part(overlay) {
+    pointer-events: none;
+}

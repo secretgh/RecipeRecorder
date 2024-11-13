@@ -1,17 +1,26 @@
 global using RecipeRecorder.Server;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using RecipeRecorder.Server.Controllers;
+using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-
-
-builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<DevContext>(options => options.UseSqlServer("Data Source=localhost,1433; database=DEV; User ID=sa;Password=P@ssword!;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;"));
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(x => 
+    {
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        x.JsonSerializerOptions.WriteIndented = true;
+    });
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<RecipeController>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API Name", Version = "v1" });
+});
 
 var app = builder.Build();
 
@@ -19,6 +28,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+    app.UseSwagger();
+    app.UseSwaggerUI(s => { s.SwaggerEndpoint("/swagger/v1/swagger.json", "API V1"); });
+    app.UseDeveloperExceptionPage();
 }
 else
 {
@@ -27,16 +39,14 @@ else
     app.UseHsts();
 }
 
+app.MapControllers();
 app.UseHttpsRedirection();
-
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
 
-
 app.MapRazorPages();
-app.MapControllers();
 app.MapFallbackToFile("index.html");
 
 app.Run();

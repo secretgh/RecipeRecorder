@@ -1,9 +1,55 @@
 ﻿@inherits LayoutComponentBase
+<style>
+    .drawer-placement-start::part(header-actions){
+        display:none;
+    }
 
+    .drawer-placement-start::part(overlay) {
+        pointer-events: inherit;
+    }
+</style>
 <div class="page">
     <main>
+        <sl-drawer 
+            noHeader
+            placement="start"
+            class="drawer-placement-start"
+            open="@open"
+        >
+            <div slot="label">
+                Welcome to your recipe needs
+                <div style="margin:15px;"/>
+                <nav>
+                    <div class="nav-item">
+                        <NavLink href="" @onclick="()=>{setOpen(false);}">
+                            <sl-button style="margin: 2px;">
+                                <span class="oi oi-list-rich" aria-hidden="true"></span>
+                                Collection of Recipes
+                            </sl-button>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item" >
+                        <NavLink href="RecipeEdit" @onclick="()=>{setOpen(false);}">
+                            <sl-button style="margin: 2px;">
+                                <span class="oi oi-plus" aria-hidden="true"></span>
+                                New Recipe
+                            </sl-button>
+                        </NavLink>
+                    </div>
+                </nav>
+            </div>
+            <sl-button slot="footer" variant="primary"
+                @onclick="()=>setOpen(false)"
+            >
+                Close
+            </sl-button>
+        </sl-drawer>
         <div class="top-row" style="justify-content: start">
-            <a href="">Recipe Recorder</a>
+            <sl-button id="menuBtn" 
+                @onclick="()=>setOpen(true)"
+            >
+                Menu
+            </sl-button>
         </div>
 
         <article class="content px-4">
@@ -11,3 +57,20 @@
         </article>
     </main>
 </div>
+
+@code {
+    private bool open = false;
+    private void setOpen(bool value)
+    {
+        if(open == true)
+        {
+            open = false;
+            StateHasChanged();
+        }
+        else
+        {
+            open = value;
+            StateHasChanged();
+        }
+    }
+}

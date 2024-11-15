@@ -3,7 +3,7 @@
 
 @page "/"
 
-<h3>Recipe Collection</h3>
+<h3 style="text-align: center;">Recipe Collection</h3>
 @if (!_render)
 {
     <div class="spinner-border" role="status" style="margin:5px;">
@@ -32,6 +32,7 @@ else
                 }
             }
         </div>
+        <button hidden @onclick="()=>{RecipeService.Test();}">Test</button>
     }
     else
     {

@@ -21,9 +21,4 @@ public partial class RecipeStep
 
     [Unicode(false)]
     public string? SubText { get; set; }
-
-    [JsonIgnore]
-    [ForeignKey("RecipeId")]
-    [InverseProperty("RecipeSteps")]
-    public virtual Recipe? Recipe { get; set; } = null!;
 }

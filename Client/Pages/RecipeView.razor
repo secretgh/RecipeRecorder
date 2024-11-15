@@ -1,7 +1,126 @@
-﻿@page "/RecipeView/{id:int}" @inject IRecipeService RecipeService @inject NavigationManager NavManager @inject IJSRuntime JS  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">  <PageTitle>Recipe View</PageTitle> <div>     @if (_render)     {         <div>             <!-- Recipe Name-->             <div style="display: flex; justify-content:space-around; margin:1px;">                     <span class="auto"                     readonly                     style="width: 500px; height: auto; text-align:center; border: 0px solid black; font-size: 2vw;"                      >                         <label>@Model.RecipeName </label>                         <sl-icon-button                          name="pencil"                          label="Edit"                         style="font-size: 1.5rem; position:absolute"                         @onclick="EditRecipe" />                 </span>             </div>              <!-- Recipe Description -->             <div style="display: flex; justify-content:space-around;">                 <span   class="auto"                         readonly                         style="width: 300px; height:auto; border: 0px solid black;text-align:center; font-size: 1.25vw;                           margin:5px; padding: 2px;"                         >@Model.RecipeDesc</span>             </div>              <!-- Tags -->             <div style="display:flex; flex-direction:row; justify-content:center; margin:10px;">                 @{                     foreach (RecipeTag tag in Model.RecipeTags)                     {                         <sl-tag pill variant="primary" style="margin: 5px;">@tag.Tag</sl-tag>                     }                 }             </div>             <br />              <div style="display: flex; justify-content:center; align-items:center;">                 <hr style="width: 200px; margin:5px; " />                 <label style="text-align:center; font-size:30px; font-family:Castellar;">Ingredients</label>                 <hr style="width: 200px;margin:5px;" />             </div>              <br/>              <!-- List of Ingredients -->             <div style="display:flex; flex-direction: column; flex-wrap:wrap; align-content:center">                 @{                     foreach (RecipeIngredient i in Model.RecipeIngredients)                     {                         <sl-card class="auto" style="width: 600px; font-size:1.25vw; margin: 2px;">                                 @i.Ing.IngredientName - @i.Quantity @i.QuantityDesc                         </sl-card>                     }                 }             </div>             <br />             <br/>                  <div style="display: flex; justify-content:center; align-items:center;">                 <hr style="width: 200px; margin:5px;" />                     <label style="text-align:center; font-size:30px; font-family:Castellar;">Instructions</label>                 <hr style="width: 200px;margin:5px;" />             </div>             <br />             <!-- List of Instructions -->             <div style="display:flex; flex-direction: column; align-content:center; flex-wrap:wrap;">                 @{                     int stepIndex = 1;                     foreach (RecipeStep s in Model.RecipeSteps)                     {                         <sl-card class="auto" style="width: 600px; font-size:1.25vw; margin:2px; word-break:break-word;">                         #@stepIndex @s.Step                         </sl-card>                         stepIndex++;                     }                 }             </div>              <br />             <br />         </div>     }     else     {         <div class="spinner-border" role="status" style="margin:5px;">             <span class="sr-only" style="padding-left: 10px;">Loading...</span>         </div>     } </div>   @code {
-    [Parameter]     public int id { get; set; }     public Recipe Model = new Recipe();      private bool _render = false;      protected override async Task OnInitializedAsync()     {         base.OnInitialized();         Model = await RecipeService.GetRecipe(id);         _render = true;     }
+﻿@page "/RecipeView/{id:int}"
+@inject IRecipeService RecipeService
+@inject NavigationManager NavManager
+@inject IJSRuntime JS
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<PageTitle>Recipe View</PageTitle>
+<div>
+    @if (_render)
+    {
+        <div>
+            <!-- Recipe Name-->
+            <div style="display: flex; justify-content:space-around; margin:1px;">
+                <span class="auto"
+                readonly
+                style="width: 500px; height: auto; text-align:center; border: 0px solid black; font-size: 2vw;" 
+                >
+                    <label>@Model.RecipeName </label>
+                    <sl-icon-button 
+                    name="pencil" 
+                    label="Edit"
+                    style="font-size: 1.5rem; position:absolute"
+                    @onclick="EditRecipe" />
+                </span>
+            </div>
+
+            <!-- Recipe Description -->
+            <div style="display: flex; justify-content:space-around;">
+                <span   class="auto"
+                readonly
+                style="width: 300px; height:auto; border: 0px solid black;text-align:center; font-size: 1.25vw; 
+                         margin:5px; padding: 2px;"
+                >@Model.RecipeDesc</span>
+            </div>
+
+            <!-- Tags -->
+            <div style="display:flex; flex-direction:row; justify-content:center; margin:10px;">
+                @{
+                    foreach (RecipeTag tag in Model.RecipeTags)
+                    {
+                        <sl-tag pill variant="primary" style="margin: 5px;">@tag.Tag</sl-tag>
+                    }
+                }
+            </div>
+            <br />
+
+            <div style="display: flex; justify-content:center; align-items:center;">
+                <hr style="width: 200px; margin:5px; " />
+                <label style="text-align:center; font-size:30px; font-family:Castellar;">Ingredients</label>
+                <hr style="width: 200px;margin:5px;" />
+            </div>
+
+            <br/>
+
+            <!-- List of Ingredients -->
+            <div style="display:flex; flex-direction: column; flex-wrap:wrap; align-content:center">
+                @{
+                    foreach (RecipeIngredient i in Model.RecipeIngredients)
+                    {
+                        @if(i.Ing != null){
+                            <sl-card class="auto" style="width: 600px; font-size:1.25vw; margin: 2px;">
+                                @i.Ing.IngredientName - @i.Quantity @i.QuantityDesc
+                            </sl-card>
+                        }
+                    }
+                }
+            </div>
+            <br />
+            <br/>
+
+            <div style="display: flex; justify-content:center; align-items:center;">
+                <hr style="width: 200px; margin:5px;" />
+                <label style="text-align:center; font-size:30px; font-family:Castellar;">Instructions</label>
+                <hr style="width: 200px;margin:5px;" />
+            </div>
+            <br />
+            <!-- List of Instructions -->
+            <div style="display:flex; flex-direction: column; align-content:center; flex-wrap:wrap;">
+                @{
+                    int stepIndex = 1;
+                    foreach (RecipeStep s in Model.RecipeSteps)
+                    {
+                        <sl-card class="auto" style="width: 600px; font-size:1.25vw; margin:2px; word-break:break-word;">
+                            #@stepIndex @s.Step
+                        </sl-card>
+                        stepIndex++;
+                    }
+                }
+            </div>
+
+            <br />
+            <br />
+        </div>
+    }
+    else
+    {
+        <div class="spinner-border" role="status" style="margin:5px;">
+            <span class="sr-only" style="padding-left: 10px;">Loading...</span>
+        </div>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    public Recipe Model = new Recipe();
+
+    private bool _render = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        await RecipeService.GetRecipes();
+        Model = await RecipeService.GetRecipe(id);
+        _render = true;
+        StateHasChanged();
+    }
 
     private void EditRecipe()
     {
         NavManager.NavigateTo($"RecipeEdit/{id}");      
-    }  } 
+    }
+
+}

@@ -19,9 +19,4 @@ public partial class RecipeTag
     [StringLength(40)]
     [Unicode(false)]
     public string Tag { get; set; } = null!;
-
-    [JsonIgnore]
-    [ForeignKey("RecipeId")]
-    [InverseProperty("RecipeTags")]
-    public virtual Recipe? Recipe { get; set; } = null!;
 }

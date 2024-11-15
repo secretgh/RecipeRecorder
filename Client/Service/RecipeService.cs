@@ -10,11 +10,11 @@ namespace RecipeRecorder.Client.Service
         Task<List<Recipe>> GetRecipes();
         Task<Recipe> GetRecipe(int id);
         Task CreateRecipe(Recipe r);
-        Task<Recipe> UpdateRecipe(Recipe r);
+        Task UpdateRecipe(Recipe r);
         Task<List<Ingredient>> SearchIngredients(string s);
         Task<Ingredient> CreateIngredient(Ingredient i);
-        Task DeleteTag(int rid, int id);
         Task<bool> TestConnection();
+        Task Test();
     }
 
     public class RecipeService : IRecipeService
@@ -23,6 +23,11 @@ namespace RecipeRecorder.Client.Service
 
         public RecipeService(HttpClient client) { 
             _httpClient = client;
+        }
+
+        public async Task Test()
+        {
+            await _httpClient.PostAsJsonAsync<string>("api/Recipe/Test", "");
         }
 
         public async Task<bool> TestConnection() {
@@ -46,24 +51,10 @@ namespace RecipeRecorder.Client.Service
             HttpResponseMessage result = await _httpClient.PostAsJsonAsync("api/Recipe", r);
         }
 
-        public async Task<Recipe> UpdateRecipe(Recipe r)
+        public async Task UpdateRecipe(Recipe r)
         {
             var result = await _httpClient.PutAsJsonAsync($"api/Recipe", r);
-            var Recipe = await result.Content.ReadFromJsonAsync<Recipe>();
-            return Recipe;
-        }
-
-        public async Task CreateRecipeIngredients(int rid, RecipeIngredient i)
-        {
-            await _httpClient.PostAsJsonAsync<RecipeIngredient>($"api/Recipe/{rid}/Recipeingredients", i);
-        }
-
-
-        public async Task<List<RecipeIngredient>> GetRecipeIngredients(int rid)
-        {
-            var results = await _httpClient.GetFromJsonAsync<List<RecipeIngredient>>($"api/Recipe/{rid}/Recipeingredients");
-            return results;
-        }        
+        } 
 
         public async Task<Ingredient> CreateIngredient(Ingredient i)
         {
@@ -79,9 +70,5 @@ namespace RecipeRecorder.Client.Service
             return ingredients;
         }
 
-        public async Task DeleteTag(int rid, int id)
-        {
-            await _httpClient.DeleteAsync($"api/Recipe/{rid}/tags/{id}");
-        }
     }
 }

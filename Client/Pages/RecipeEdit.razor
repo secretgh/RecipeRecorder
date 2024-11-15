@@ -10,43 +10,41 @@
 <div class="leftpan" >
     @if (_render)
     {
-         <div>
+        <div>
             <!-- Recipe Name-->
             <div style="display: flex; justify-content:space-around; margin:1px;">
-                    <input type="text"
-                       style="width: 500px; height: 100px; text-align:center; border: 0px solid black; font-size: 30px; margin: 5px;field-sizing: content; wrap: hard;"
-                       placeholder="Recipe Name" 
-                       maxlength="50"
-                    @bind-value="Model.RecipeName" />
+                <input type="text"
+                style="width: 500px; height: 100px; text-align:center; border: 0px solid black; font-size: 30px; margin: 5px;field-sizing: content; wrap: hard;"
+                placeholder="Recipe Name" 
+                maxlength="50"
+                @bind-value="Model.RecipeName" />
             </div>
 
             <!-- Recipe Description -->
             <div style="display: flex; justify-content:space-around;">
-                 <textarea
-                        style="width: 300px;  
+                <textarea
+                style="width: 300px;  
                         border: 0px solid black;text-align:center; 
                         font-size: 15px; resize:none;
                         overflow:hidden; margin-bottom:5px;
                         field-sizing: content; wrap: hard;"
-                        maxlength="255"                        
-                        placeholder="Description" 
-                        @bind="Model.RecipeDesc"
-                        @bind:event="oninput" /> 
+                maxlength="255"                        
+                placeholder="Description" 
+                @bind="Model.RecipeDesc"
+                @bind:event="oninput" /> 
             </div>
             <br />
             <!-- Tags -->
-            @if (id == null || tag != "")
-            {
             <div style="display:flex; justify-content:space-around;">
                 <input type="text"
-                    class="w3-card"
-                    @bind-value="tag"
-                    style="width: 80px; height: 30px;
-                    border-radius: 5px; border: 0px solid black; margin:2px; padding: 2px; text-align:center;"
-                    placeholder="Tag" 
-                    @onkeyup="TagEnterKeyPressed" />
+                class="w3-card"
+                @bind-value="tag"
+                style="width: 80px; height: 30px;
+                border-radius: 5px; border: 0px solid black; margin:2px; padding: 2px; text-align:center;"
+                placeholder="Tag" 
+                @onkeyup="TagEnterKeyPressed" />
             </div>
-            }
+            
 
             <div style="display:flex; flex-direction:row; justify-content:center;">
                 @{
@@ -56,7 +54,7 @@
                         {
                             <sl-tag pill variant="primary" style="margin: 5px;" @onclick="()=>onTagClick(tag)">@tag.Tag</sl-tag>
                         }
-                        
+
                     }
                 }
             </div>
@@ -90,21 +88,21 @@
                 style="width:400px; font-family:Castellar; font-size:20px; margin:5px;"
                 @onclick="OnAddIngredientClick">+</button>
 
-                 <sl-dialog open="@IngredientPopupOpen">
+                <sl-dialog open="@IngredientPopupOpen">
                     <div style="display: flex; flex-direction: column;">
                         <label for="IAdditions">Ingredient Additional Descriptions (optional):</label>
 
                         <input id="IAdditions" @bind-value="ingredient.IngredientNameModifier"
-                               style="width:100%; height: 37px; border: 1px solid #bfbfbf; border-radius:5px; text-indent:5px;"
-                               placeholder="ex: rough chopped, diced"
+                        style="width:100%; height: 37px; border: 1px solid #bfbfbf; border-radius:5px; text-indent:5px;"
+                        placeholder="ex: rough chopped, diced"
                         />
                         <br />
                         <label>Ingredient Name:</label>
                         <BlazoredTypeahead  
-                            SearchMethod="SearchIngredients" 
-                            @bind-Value="selectedIngredient"
-                            AddItemOnEmptyResultMethod="AddIngredientLookUp" 
-                            placeholder="Type here to search or hit enter to add new ingredient"
+                        SearchMethod="SearchIngredients" 
+                        @bind-Value="selectedIngredient"
+                        AddItemOnEmptyResultMethod="AddIngredientLookUp" 
+                        placeholder="Type here to search or hit enter to add new ingredient"
                         >
                             <SelectedTemplate>
                                 @if (context != null)
@@ -127,16 +125,16 @@
                                 }
                             </ResultTemplate>
                         </BlazoredTypeahead>
-                
+
                         <br />
                         <label for="IAmount">Amount of ingredient:</label>
                         <input id="IAmount"  type="text" inputmode="numeric" 
-                            style="width:100%; height: 37px; border:1px solid #bfbfbf; border-radius:5px; text-indent:5px;" @bind-value="ingredient.Quantity" 
-                            />
+                        style="width:100%; height: 37px; border:1px solid #bfbfbf; border-radius:5px; text-indent:5px;" @bind-value="ingredient.Quantity" 
+                        />
                         <br />
                         <label for="IAmountDesc">Description of amount (optional):</label>
                         <input id="IAmountDesc" style="width: 100%; height: 37px; border:1px solid #bfbfbf; border-radius:5px; text-indent:5px;"
-                               @bind-value="ingredient.QuantityDesc" placeholder="ex: grams, ml etc" @onkeyup="IngredientEnterKeyPressed" />
+                        @bind-value="ingredient.QuantityDesc" placeholder="ex: grams, ml etc" @onkeyup="IngredientEnterKeyPressed" />
                         <hr />
                         <sl-card class="auto" style="font-size:1.05vw; margin: 2px;">
                             <label slot="header">Preview</label>
@@ -147,7 +145,7 @@
                     <div slot="footer">
                         <sl-button @onclick="()=>{if(AddIngredient()){OnCloseIngredientClick();}}">Add</sl-button>
                         <sl-button @onclick="OnCloseIngredientClick">Close</sl-button>
-                </div>
+                    </div>
                 </sl-dialog> 
             </div>
             <br />
@@ -164,7 +162,7 @@
                     int stepIndex = 1;
                     foreach (RecipeStep s in Model.RecipeSteps)
                     {
-                        <sl-card class="auto" 
+                        <sl-card class="auto" @onclick="()=>{ onStepClick(s);}"
                         style="width: 400px; font-size:15px; margin:2px; word-break:break-word;">
                             #@stepIndex @s.Step
                         </sl-card>
@@ -178,13 +176,13 @@
                         font-size: 15px; resize:none; border-radius: 5px;
                         overflow:hidden; margin-bottom:5px;
                         field-sizing: content; wrap: hard;"
-                              placeholder="#@(stepIndex.ToString()) Step"
-                              @onkeyup="StepEnterKeyPressed"
-                              @bind="step.Step" 
-                              @bind:event="oninput"
-                              />
+                    placeholder="#@(stepIndex.ToString()) Step"
+                    @onkeyup="StepEnterKeyPressed"
+                    @bind="step.Step" 
+                    @bind:event="oninput"
+                    />
                 </div>                    
-                
+
             </div>
 
             <br />
@@ -329,11 +327,12 @@
         {
             if(selectedTag != null)
             {
+                selectedTag.Tag = tag;
                 selectedTag = null;
             }
             else
-            {
-                Model.RecipeTags.Add(new RecipeTag { Tag = tag, Recipe = Model });
+            {               
+                Model.RecipeTags.Add(new RecipeTag { Tag = tag, RecipeId = Model.Id});           
             }
             tag = "";
         }    
@@ -343,6 +342,11 @@
     {
         selectedTag = t;
         tag = t.Tag;
+        StateHasChanged();
+    }
+
+    private async void onStepClick(RecipeStep s){
+        step = s;
         StateHasChanged();
     }
 
@@ -357,17 +361,23 @@
     {
         if(selectedIngredient != null && ingredient.Quantity != 0)
         {
-            if(Model.RecipeIngredients.Exists(i => i.IngId == ingredient.IngId))
+            if(Model.RecipeIngredients.Any(i => i.IngId == ingredient.IngId && i.Ing != null))
             {
+                Console.WriteLine("[TEST] i.ingid and ing is null - aka modifying existing ingredient");
                 int i = Model.RecipeIngredients.IndexOf(ingredient);
                 Model.RecipeIngredients[i] = ingredient;
             }
-            else
+            else if(Model.RecipeIngredients.Any(i => i.IngId == selectedIngredient.Id))
             {
+                Console.WriteLine("[TEST] i.ingid - new existing ingredient");
+                Model.RecipeIngredients.FindAll(i => i.IngId == ingredient.IngId).ForEach(i => { i.Quantity += ingredient.Quantity; });       
+            }
+            else{
+                Console.WriteLine("[TEST] new non-existing ingredient");
                 ingredient.IngId = selectedIngredient.Id;
                 ingredient.Ing = selectedIngredient;
-                ingredient.Recipe = Model;
-                Model.RecipeIngredients.Add(ingredient);                
+                ingredient.RecipeId = Model.Id;
+                Model.RecipeIngredients.Add(ingredient);
             }
 
             ingredient = new RecipeIngredient();
@@ -387,8 +397,11 @@
         step.Step = step.Step.Replace("\n", "");
         if(step.Step != "")
         {
-            step.Recipe = Model;
-            Model.RecipeSteps.Add(step);
+            if(step.Id == 0){
+                step.RecipeId = Model.Id;
+                Model.RecipeSteps.Add(step);
+            }
+
             step = new RecipeStep();
         }
         else

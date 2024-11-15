@@ -2,6 +2,7 @@
 using Microsoft.Data.SqlClient;
 using RecipeRecorder.Shared;
 using Microsoft.EntityFrameworkCore;
+using Azure;
 
 namespace RecipeRecorder.Server.Controllers
 {
@@ -9,8 +10,6 @@ namespace RecipeRecorder.Server.Controllers
     [Route("api/[controller]")]
     public class RecipeController : ControllerBase
     {
-        static List<Recipe> recipes = new List<Recipe>();
-
         private readonly IConfiguration _config;
         private readonly DevContext _context;
         private readonly string databaseString = "local";
@@ -35,48 +34,110 @@ namespace RecipeRecorder.Server.Controllers
             }
         }
 
-        #region "Recipe Object CRUD"
+        [HttpPost("Test")]
+        public async Task<IActionResult> TestCreate()
+        {
+            /*            RecipeIngredient i = new RecipeIngredient();
+                        i.RecipeId = 3;
+                        i.IngId = 1;
+                        _context.RecipeIngredients.Add(i);
+                        _context.SaveChanges();*/
+            return Ok();
+        }
+
+        [HttpGet("ingredients/{search}")]
+        public async Task<IActionResult> GetFilteredIngredients(string search)
+        {
+            List<Ingredient> searchedIngredients = await _context.Ingredients.Where(i => i.IngredientName.Contains(search)).ToListAsync();
+            return Ok(searchedIngredients);
+        }
+
+        #region "Object CRUD"
 
         [HttpGet]
         public async Task<IActionResult> GetRecipes()
         {
-            recipes = await _context.Recipes
-                .Include(recipe => recipe.RecipeIngredients).ThenInclude(i => i.Ing)
+            List<Recipe> recipes = await _context.Recipes
+                .Include(recipe => recipe.RecipeIngredients)
                 .Include(recipe => recipe.RecipeSteps)
                 .Include(recipe => recipe.RecipeTags)
                 .ToListAsync();
-                            
+
            return Ok(recipes);
         }
 
         [HttpGet("{id}")]
-        public Task<IActionResult> GetRecipe(int id)
+        public async Task<IActionResult> GetRecipe(int id)
         {
-            var recipe = recipes.FirstOrDefault(r => r.Id == id);
+            Recipe? recipe = await _context.Recipes
+                .Include(recipe => recipe.RecipeIngredients)
+                .Include(recipe => recipe.RecipeSteps)
+                .Include(recipe => recipe.RecipeTags)
+                .FirstOrDefaultAsync(r => r.Id == id);
             if (recipe == null)
             {
-                return Task.FromResult<IActionResult>(NotFound("Recipe was not found"));
+                return NotFound("Recipe was not found");
             }
 
-            return Task.FromResult<IActionResult>(Ok(recipe));
+            foreach(RecipeIngredient ir in recipe.RecipeIngredients)
+            {
+                ir.Ing = await _context.Ingredients.FirstAsync(i => i.Id == ir.IngId);
+            }
+
+            return Ok((Recipe)recipe);
+        }
+
+        [HttpGet("ingredient/{id}")]
+        public async Task<IActionResult> GetIngredient(int id)
+        {
+            return Ok(await _context.Ingredients.FirstAsync(r => r.Id == id));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateRecipe([FromBody] Recipe r)
         {
             Console.WriteLine("Create Recipe End Point Hit!");
-            await _context.Recipes.AddAsync(r);
-/*            foreach (RecipeTag t in r.RecipeTags)
+
+            using (SqlConnection con = new SqlConnection(_config.GetConnectionString("local")))
+            {
+                con.Open();
+                SqlCommand createRecipe = new SqlCommand("CreateRecipe", con);
+                SqlCommand createStep = new SqlCommand("CreateStep", con);
+                SqlCommand createIngredient = new SqlCommand("CreateIngredient", con);
+                SqlCommand createTag = new SqlCommand("CreateTag", con);
+                createRecipe.CommandType = System.Data.CommandType.StoredProcedure;
+                createIngredient.CommandType = System.Data.CommandType.StoredProcedure;
+                createStep.CommandType = System.Data.CommandType.StoredProcedure;
+                createTag.CommandType = System.Data.CommandType.StoredProcedure;
+                try
+                {
+                    //recipe table
+                    createRecipe.Parameters.AddRange(new SqlParameter[]{
+                        new SqlParameter("@name", r.RecipeName),
+                        new SqlParameter("@desc", r.RecipeDesc)
+                    });
+
+                    r.Id = int.Parse(createRecipe.ExecuteScalar().ToString());
+                    con.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return BadRequest();
+                }
+            }
+
+            foreach (RecipeTag t in r.RecipeTags)
             {
                 t.RecipeId = r.Id;
-                _context.RecipeTags.Add(t);
+                await _context.RecipeTags.AddAsync(t);
             }
 
             //step table
             foreach (RecipeStep s in r.RecipeSteps)
             {
                 s.RecipeId = r.Id;
-                _context.RecipeSteps.Add(s);
+                await _context.RecipeSteps.AddAsync(s);
             }
 
             //RecipeIngredient table
@@ -84,56 +145,69 @@ namespace RecipeRecorder.Server.Controllers
             {
 
                 i.RecipeId = r.Id;
-                _context.RecipeIngredients.Add(i);
-            }*/
+                await _context.RecipeIngredients.AddAsync(i);
+            }
 
             await _context.SaveChangesAsync();
-            await GetRecipes();
-
             return Ok();
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateRecipe(Recipe r)
         {
-            var recipe = await _context.Recipes.FindAsync(r.Id);
 
-            if(recipe == null)
+            if(r == null)
             {
-                return NotFound(null);
+                return BadRequest(r);
             }
-
+            else
+            {
+                _context.Recipes.Entry(r).State = EntityState.Modified;
+            }
             foreach (RecipeTag t in r.RecipeTags)
             {
-                if(!_context.RecipeTags.Contains(t))
-                    _context.RecipeTags.Add(t);
+                if (!_context.RecipeTags.Any(tag => tag.Id == t.Id))
+                { 
+                    await _context.RecipeTags.AddAsync(t);            
+                }
+                else
+                {
+                    _context.RecipeTags.Entry(t).State = EntityState.Modified;
+                }
             }
 
             //step table
             foreach (RecipeStep s in r.RecipeSteps)
             {
-                if(!_context.RecipeSteps.Contains(s))
-                    _context.RecipeSteps.Add(s);
+                if (!_context.RecipeSteps.Any(step => step.Id == s.Id))
+                { 
+                    await _context.RecipeSteps.AddAsync(s);
+                }   
+                else
+                {
+                    _context.RecipeSteps.Entry(s).State = EntityState.Modified;
+                }
             }
 
             //RecipeIngredient table
             foreach (RecipeIngredient i in r.RecipeIngredients)
             {
-                if(!_context.RecipeIngredients.Contains(i))
-                    _context.RecipeIngredients.Add(i);
+                if (!_context.RecipeIngredients.Any(ri => ri.IngId == i.IngId && ri.RecipeId == r.Id)) { 
+                    await _context.RecipeIngredients.AddAsync(i);                
+                }
+                else
+                {
+                    _context.RecipeIngredients.Entry(i).State = EntityState.Modified;
+                }
             }
 
-            _context.SaveChanges();
-            recipes = await _context.Recipes.ToListAsync();
-            return Ok(recipes);
+            await _context.SaveChangesAsync();
+            return Ok();
         }
-        #endregion
-
-        #region "Tag Object CRUD"
 
         [HttpGet("{rid}/tags")]
         public async Task<IActionResult> GetRecipeTags(int rid) {
-            var recipe = recipes.FirstOrDefault(h => h.Id == rid);
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(h => h.Id == rid);
 
             if (recipe == null)
             {
@@ -146,7 +220,7 @@ namespace RecipeRecorder.Server.Controllers
         [HttpGet("{rid}/tags/{id}")]
         public async Task<IActionResult> GetRecipeTag(int rid, int id)
         {
-            var recipe = recipes.FirstOrDefault(r => r.Id == rid);
+            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == rid);
 
 
             if (recipe == null)
@@ -164,149 +238,13 @@ namespace RecipeRecorder.Server.Controllers
             return Ok(tag);
         }
 
-        [HttpPut("{rid}/tags/{id}")]
-        public async Task<IActionResult> UpdateTag(int rid, int id, RecipeTag tag)
-        {
-            //List<Tag> tags = recipes[recipes.FindIndex(r => r.id == rid)].tags;
-
-            //using (SqlConnection con = new SqlConnection(_config.GetConnectionString(databaseString)))
-            //{
-            //    con.Open();
-            //    SqlCommand cmd = new SqlCommand("UpdateTag", con);
-            //    cmd.CommandType = CommandType.StoredProcedure;
-            //    try
-            //    {
-            //        cmd.Parameters.AddRange(new SqlParameter[] {
-            //            new SqlParameter("@ID", tag.id),
-            //            new SqlParameter("@Tag", tag.description)
-            //        });
-            //        await cmd.ExecuteNonQueryAsync();
-            //        con.Close();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine(ex.Message);
-            //    }
-            //}
-
-            //tags[tags.FindIndex(t => t.id == id)] = tag;
-            //return Ok(tag);
-            var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == rid);
-            if(recipe == null)
-            {
-                return NotFound(null);
-            }
-
-            if (!_context.RecipeTags.Contains(tag))
-            {
-                _context.RecipeTags.Add(tag);
-            }
-
-            _context.SaveChanges();
-
-            return Ok(tag);
-        }
-
-        [HttpDelete("{rid}/tags/{id}")]
-        public async Task<IActionResult> DeleteTag(int rid, int id)
-        {
-            //List<Tag> tags = recipes[recipes.FindIndex(r => r.id == rid)].tags;
-            //using (SqlConnection con = new SqlConnection(_config.GetConnectionString(databaseString)))
-            //{
-            //    con.Open();
-            //    SqlCommand cmd = new SqlCommand("DeleteTag", con);
-            //    cmd.CommandType = CommandType.StoredProcedure;
-            //    try
-            //    {
-            //        cmd.Parameters.AddRange(new SqlParameter[] {
-            //            new SqlParameter("@id", id)
-            //        });
-            //        await cmd.ExecuteNonQueryAsync();
-            //        con.Close();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine(ex.Message);
-            //    }
-            //}
-            //tags.Remove(tags[tags.FindIndex(t => t.id == id)]);
-            //return Ok();
-            return Ok(null);
-        }
-
-        private async Task<List<RecipeTag>> GetTags(int id)
-        {
-            //using (SqlConnection con = new SqlConnection(_config.GetConnectionString(databaseString)))
-            //{
-            //    con.Open();
-            //    SqlCommand cmd = new SqlCommand("GetTags", con);
-            //    cmd.CommandType = CommandType.StoredProcedure;
-            //    cmd.Parameters.AddWithValue("recipeID", id);
-            //    SqlDataReader reader = await cmd.ExecuteReaderAsync();
-            //    var tags = new List<Tag>();
-            //    while (reader.Read())
-            //    {
-            //        Tag t = new Tag
-            //        {
-            //            id = int.Parse(reader["ID"].ToString()),
-            //            description = reader["Tag"].ToString()
-            //        };
-            //        tags.Add(t);
-            //    }
-
-            //    con.Close();
-            //    return tags;
-            //}
-            
-            return null;
-        }
-
-
-
-
-        #endregion
-
-
-        [HttpGet("{rid}/recipeingredients")]
-        public async Task<List<RecipeIngredient>> GetRecipeIngredients(int rid)
-        {
-            Recipe r = await _context.Recipes.Where(r => r.Id == rid).FirstAsync();
-
-            if (r == null)
-            {
-                List<RecipeIngredient> recipeIngredients = new List<RecipeIngredient>();
-                return recipeIngredients;
-            }
-
-            return r.RecipeIngredients;
-        }
-
-        [HttpPost("{rid}/recipeingredients")]
-        public async Task<IActionResult> CreateRecipeIngredient(int rid, [FromBody] RecipeIngredient recipeIngredient)
-        {
-            Recipe r = await _context.Recipes.Where(r => r.Id == rid).FirstAsync();
-            if (r == null)
-            {
-                return NotFound("Recipe does not exist.");
-            }
-
-            await _context.RecipeIngredients.AddRangeAsync(recipeIngredient);
-            _context.SaveChanges();
-            return Ok();
-        }
-
         [HttpGet("ingredients")]
         public async Task<IActionResult> GetAllIngredients()
         {
             List<Ingredient> ingredients = await _context.Ingredients.ToListAsync();
             return Ok(ingredients);
         }
-        [HttpGet("ingredients/{search}")]
-        public async Task<IActionResult> GetFilteredIngredients(string search)
-        {
-            List<Ingredient> searchedIngredients = await _context.Ingredients.Where(i => i.IngredientName.Contains(search)).ToListAsync();
-            return Ok(searchedIngredients);
-        }
+
         [HttpPost("ingredients")]
         public async Task<Ingredient> CreateIngredient([FromBody] Ingredient i)
         {
@@ -315,17 +253,6 @@ namespace RecipeRecorder.Server.Controllers
             return i;
         }
 
-
-        [HttpGet("{rid}/steps")]
-        public async Task<List<RecipeStep>> GetSteps(int rid)
-        {
-           Recipe r = await _context.Recipes.Where(r => r.Id == rid).FirstAsync();
-           if (r == null) {
-            return new List<RecipeStep>();
-           }
-
-           return r.RecipeSteps;
-        }
-
     }
+    #endregion
 }

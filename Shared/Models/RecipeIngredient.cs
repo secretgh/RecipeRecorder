@@ -27,12 +27,5 @@ public partial class RecipeIngredient
     [Unicode(false)]
     public string? QuantityDesc { get; set; }
 
-    [ForeignKey("IngId")]
-    [InverseProperty("RecipeIngredients")]
-    public virtual Ingredient Ing { get; set; } = null!;
-
-    [JsonIgnore]
-    [ForeignKey("RecipeId")]
-    [InverseProperty("RecipeIngredients")]
-    public virtual Recipe? Recipe { get; set; } = null!;
+    public Ingredient Ing { get; set; } 
 }

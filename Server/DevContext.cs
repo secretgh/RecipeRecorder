@@ -32,9 +32,9 @@ public partial class DevContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e=>e.Id).ValueGeneratedOnAdd();
-
-            entity.HasMany(e => e.RecipeIngredients)
-                  .WithOne(e => e.Recipe)
+/*
+            entity.HasMany(e => e.rec)
+                  .WithOne(e => e)
                   .HasForeignKey(e=>e.RecipeId)
                   .IsRequired();
             entity.HasMany(e => e.RecipeTags)
@@ -44,7 +44,7 @@ public partial class DevContext : DbContext
             entity.HasMany(e => e.RecipeSteps)
                   .WithOne(e => e.Recipe)
                   .HasForeignKey(e => e.RecipeId)
-                  .IsRequired();
+                  .IsRequired();*/
         });
 
         modelBuilder.Entity<Ingredient>(entity =>
@@ -56,8 +56,8 @@ public partial class DevContext : DbContext
         modelBuilder.Entity<RecipeIngredient>(entity =>
         {
             entity.HasKey(e => new { e.IngId, e.RecipeId });
-
-            entity.HasOne(e => e.Recipe)
+            entity.Ignore(e => e.Ing);
+           /* entity.HasOne(e => e.Recipe)
                   .WithMany(e => e.RecipeIngredients)
                   .HasForeignKey(e=>e.RecipeId)
                   .IsRequired();
@@ -65,7 +65,7 @@ public partial class DevContext : DbContext
             entity.HasOne(e => e.Ing)
                  .WithMany(e => e.RecipeIngredients)
                  .HasForeignKey(e => e.IngId)
-                 .IsRequired();
+                 .IsRequired();*/
         });
 
         modelBuilder.Entity<RecipeStep>(entity =>
@@ -73,20 +73,20 @@ public partial class DevContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-            entity.HasOne(e => e.Recipe)
+           /* entity.HasOne(e => e.Recipe)
                  .WithMany(e => e.RecipeSteps)
                  .HasForeignKey(e => e.RecipeId)
-                 .IsRequired();
+                 .IsRequired();*/
         });
 
         modelBuilder.Entity<RecipeTag>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.HasOne(e => e.Recipe)
+           /* entity.HasOne(e => e.Recipe)
                  .WithMany(e => e.RecipeTags)
                  .HasForeignKey(e => e.RecipeId)
-                 .IsRequired();
+                 .IsRequired();*/
         });
 
         OnModelCreatingPartial(modelBuilder);

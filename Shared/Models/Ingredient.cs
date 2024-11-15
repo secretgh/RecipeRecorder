@@ -17,8 +17,4 @@ public partial class Ingredient
     [StringLength(50)]
     [Unicode(false)]
     public string IngredientName { get; set; } = null!;
-
-    [JsonIgnore]
-    [InverseProperty("Ing")]
-    public virtual List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
 }

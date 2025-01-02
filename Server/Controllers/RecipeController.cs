@@ -2,7 +2,8 @@
 using Microsoft.Data.SqlClient;
 using RecipeRecorder.Shared;
 using Microsoft.EntityFrameworkCore;
-using Azure;
+using static System.IO.File;
+using System.Text.Json;
 
 namespace RecipeRecorder.Server.Controllers
 {
@@ -42,6 +43,65 @@ namespace RecipeRecorder.Server.Controllers
                         i.IngId = 1;
                         _context.RecipeIngredients.Add(i);
                         _context.SaveChanges();*/
+            string json = (string)((OkObjectResult)await SaveToJson()).Value;
+
+
+            Console.WriteLine(json);
+            return Ok();
+        }
+
+        [HttpGet("SaveToJson")]
+        public async Task<IActionResult> SaveToJson()
+        {
+            List<Recipe> recipes = new List<Recipe>();
+            OkObjectResult task = (OkObjectResult)await GetRecipes();
+            recipes = (List<Recipe>)task.Value;
+            string json = JsonSerializer.Serialize(recipes);
+            System.IO.File.WriteAllText("./ExportedRecipes.json", json);
+            Console.WriteLine("Successfully wrote ExportedRecipes.json");
+            return Ok(json);
+        }
+
+        [HttpGet("ImportFromJson")]
+        public async Task<IActionResult> ImportFromJson([FromHeader] List<Recipe> recipes)
+        {
+            //Check if DB is up.
+            if (IsDatabaseAvaiable()) return BadRequest();
+            
+            List<Recipe> CurrentRecipes = (List<Recipe>)await GetRecipes();
+            int numberOfRecipesAdded = 0;
+            //Loop through recipes.
+            foreach (Recipe recipe in recipes)
+            {
+                //Check if recipe name matches a name from database. Skip if that is the case
+                int index = CurrentRecipes.FindIndex(r => r.RecipeName.ToLower().Trim().Equals(recipe.RecipeName.ToLower().Trim()));
+                if(index == -1) continue;
+
+                //Loop through recipe ingredients, if ingredient does not exist, create it, and set ingredient id to recipe ingredient.
+                foreach(RecipeIngredient RI in recipe.RecipeIngredients)
+                {
+                    string ingName = RI.Ing.IngredientName.ToLower();
+                    List<Ingredient> closeIngs = await _context.Ingredients.Where(ing => ing.IngredientName.Equals(ingName)).ToListAsync();
+                    if(closeIngs.Count == 0)
+                    {
+                        Ingredient i = await CreateIngredient(RI.Ing);
+                        RI.Ing = i;
+                        RI.IngId = i.Id;
+                    }
+                    else
+                    {
+                        Ingredient i = closeIngs[0];
+                        RI.Ing = i;
+                        RI.IngId = i.Id;
+                    }
+                }
+
+                //Create Recipe.    
+                await CreateRecipe(recipe);
+                numberOfRecipesAdded++;
+            }
+
+            Console.WriteLine($"Added {numberOfRecipesAdded} recipes to DB");
             return Ok();
         }
 
@@ -102,13 +162,7 @@ namespace RecipeRecorder.Server.Controllers
             {
                 con.Open();
                 SqlCommand createRecipe = new SqlCommand("CreateRecipe", con);
-                SqlCommand createStep = new SqlCommand("CreateStep", con);
-                SqlCommand createIngredient = new SqlCommand("CreateIngredient", con);
-                SqlCommand createTag = new SqlCommand("CreateTag", con);
                 createRecipe.CommandType = System.Data.CommandType.StoredProcedure;
-                createIngredient.CommandType = System.Data.CommandType.StoredProcedure;
-                createStep.CommandType = System.Data.CommandType.StoredProcedure;
-                createTag.CommandType = System.Data.CommandType.StoredProcedure;
                 try
                 {
                     //recipe table

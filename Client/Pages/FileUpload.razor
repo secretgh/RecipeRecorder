@@ -1,0 +1,70 @@
+﻿@page "/Test"
+@using System 
+@using System.IO
+@using System.Text.Json 
+@using Microsoft.AspNetCore.Components.Forms
+
+<div>
+    <h1>File Upload Example 1</h1>
+
+    <InputFile OnChange="LoadFile" />
+    <br />
+    <label>
+        Output:
+        <br />
+        @if(output != null){
+            @output
+        }
+    </label>
+
+    <br />
+    <br />
+    <table>
+        @foreach (Recipe recipe in recipes)
+        {
+            <tr>
+                <td>
+                    ID: @recipe.Id,
+                    Name: @recipe.RecipeName,
+                    Tags: @recipe.RecipeTags.Count
+                    Ingredients: @recipe.RecipeIngredients.Count,
+                    Steps: @recipe.RecipeSteps.Count
+                </td>
+            </tr>
+        }
+    </table>
+</div>
+
+
+
+@code{
+    private string output = "";
+    private List<Recipe> recipes = new List<Recipe>();
+    private async Task LoadFile(InputFileChangeEventArgs e){
+        var file = e.File;
+
+        if (file != null)
+        {
+            // Read the file as a stream
+            using (var stream = file.OpenReadStream())
+            {
+                using (var reader = new System.IO.StreamReader(stream))
+                {
+                    var fileContent = await reader.ReadToEndAsync();
+
+                    try
+                    {
+                        // Parse JSON content
+                        List<Recipe> parsedJson = JsonSerializer.Deserialize<List<Recipe>>(fileContent);
+                        recipes = parsedJson != null ? parsedJson : new List<Recipe>();
+                        output = JsonSerializer.Serialize(parsedJson, new JsonSerializerOptions { WriteIndented = true });
+                    }
+                    catch (JsonException)
+                    {
+                        output = "Invalid JSON format.";
+                    }
+                }
+            }
+        }
+    }
+}

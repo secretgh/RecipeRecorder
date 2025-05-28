@@ -1,0 +1,104 @@
+﻿@page "/ingredient-registry"
+@inject IRecipeService IngredientService
+
+<h2>Ingredient Registry</h2>
+
+<div class="form-inline mb-4">
+    <input type="text" @bind="NewIngredientName" placeholder="New or updated ingredient name" />
+    <sl-button @onclick="SaveIngredient">@(EditingIngredientId.HasValue ? "Update" : "Add")</sl-button>
+    @if (EditingIngredientId.HasValue)
+    {
+        <sl-button @onclick="CancelEdit">Cancel</sl-button>
+    }
+</div>
+
+<Virtualize @key="refreshCounter" ItemsProvider="IngredientService.LoadIngredients" Context="ingredient" ItemSize="50">
+    <div class="ingredient-entry">
+        <strong>@ingredient.IngredientName</strong>
+        <sl-button @onclick="() => ToggleRecipesAsync(ingredient.Id)">
+            @(IngredientService.GetExpandedIngredients().Contains(ingredient.Id) ? "Hide Recipes" : "Show Recipes")
+        </sl-button>
+        <sl-button @onclick="() => EditIngredient(ingredient)">Edit</sl-button>
+        <sl-button @onclick="() => DeleteIngredient(ingredient.Id)">Delete</sl-button>
+
+        @if (IngredientService.GetExpandedIngredients().Contains(ingredient.Id))
+        {
+            @if (IngredientService.GetIngredientRecipes().TryGetValue(ingredient.Id, out var recipes))
+            {
+                <ul>
+                    @if(recipes.Count > 0){
+                        @foreach (var recipe in recipes)
+                        {
+                            <li>@recipe.RecipeName</li>
+                        }
+                    }
+                    else{
+                        <li>No recipes using this ingredient</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p><em>Loading recipes...</em></p>
+            }
+        }
+    </div>
+</Virtualize>
+
+@code {
+    private string NewIngredientName = string.Empty;
+    private int? EditingIngredientId = null;
+    int refreshCounter = 0;
+
+    private async Task ToggleRecipesAsync(int ingredientId)
+    {
+        await IngredientService.ExpandIngredientRecipes(ingredientId);
+        StateHasChanged();
+    }
+
+    private void EditIngredient(Ingredient ingredient)
+    {
+        EditingIngredientId = ingredient.Id;
+        NewIngredientName = ingredient.IngredientName;
+    }
+
+    private void CancelEdit()
+    {
+        EditingIngredientId = null;
+        NewIngredientName = string.Empty;
+    }
+
+    private async Task SaveIngredient()
+    {
+        if (string.IsNullOrWhiteSpace(NewIngredientName))
+            return;
+
+        if (EditingIngredientId.HasValue)
+        {
+            await IngredientService.UpdateIngredientAsync(new Ingredient
+                {
+                    Id = EditingIngredientId.Value,
+                    IngredientName = NewIngredientName
+                });
+        }
+        else
+        {
+            await IngredientService.AddIngredientAsync(new Ingredient
+                {
+                    IngredientName = NewIngredientName
+                });
+        }
+
+        EditingIngredientId = null;
+        NewIngredientName = string.Empty;
+        refreshCounter++;
+        StateHasChanged(); // Or refetch virtualize
+    }
+
+    private async Task DeleteIngredient(int id)
+    {
+        await IngredientService.DeleteIngredientAsync(id);
+        refreshCounter++;
+        StateHasChanged(); // Or refetch virtualize
+    }
+}

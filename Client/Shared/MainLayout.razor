@@ -1,20 +1,26 @@
 ﻿@inherits LayoutComponentBase
+
 <style>
     .drawer-placement-start::part(header-actions){
-        display:none;
+    display:none;
     }
 
     .drawer-placement-start::part(overlay) {
-        pointer-events: inherit;
+    pointer-events: inherit;
     }
 </style>
+<script>
+    function toast(){
+    $('#fileSave').toast()
+    }
+</script>
 <div class="page">
     <main>
         <sl-drawer 
-            noHeader
-            placement="start"
-            class="drawer-placement-start"
-            open="@open"
+        noHeader
+        placement="start"
+        class="drawer-placement-start"
+        open="@open"
         >
             <div slot="label">
                 Welcome to your recipe needs
@@ -39,23 +45,36 @@
                 </nav>
             </div>
             <sl-button slot="footer" variant="primary"
-                @onclick="()=>setOpen(false)"
+            @onclick="()=>setOpen(false)"
             >
                 Close
             </sl-button>
         </sl-drawer>
-        <div class="top-row" style="justify-content: start">
-            <sl-button id="menuBtn" 
-                @onclick="()=>setOpen(true)"
-            >
-                Menu
-            </sl-button>
+        <div class="top-row" style="justify-content:space-between">
+            <div style="justify-content: start">
+                <sl-button id="menuBtn" 
+                @onclick="()=>setOpen(true)">
+                    Menu
+                </sl-button>
+            </div>
+            <div style="justify-content: end">
+                <sl-button @onclick="()=>{}">Save Data Locally</sl-button>
+                <NavLink href="LoadData">
+                    <sl-button>Load Data Locally</sl-button>
+                </NavLink>
+            </div>
         </div>
 
         <article class="content px-4">
             @Body
         </article>
     </main>
+    <sl-alert id="fileSave" variant="success" duration="3000" closable>
+        <sl-icon slot="icon" name="check2-circle"></sl-icon>
+        <strong>Your recipes have been saved.</strong>
+        <br />
+        The file is named ExportedRecipes.json.
+    </sl-alert>
 </div>
 
 @code {
@@ -73,4 +92,5 @@
             StateHasChanged();
         }
     }
+
 }

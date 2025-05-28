@@ -7,6 +7,7 @@
     }
 
     sl-card::part(base):hover {
+        cursor: pointer;
         background: rgba(11, 155, 227, 0.1);
         border-color: rgba(11, 155, 227, 0.5);
     }
@@ -18,14 +19,14 @@
 
 </style>
 
- <sl-card onclick="@OnClick" style="min-width:250px; max-width: 550px; margin:1px;">
-     <div slot="header">
+ <sl-card onclick="@OnClick" style="width: 550px; margin:1px;">
+    <div slot="header" style="min-width:250px; max-width: 550px;">
         @Name
      </div>
-    <div>
+    <div style="min-width:250px; max-width: 550px;">
         @Description
     </div>
-     <div slot="footer">
+     <div slot="footer" style="min-width:250px; max-width: 550px;">
         @{
             foreach(RecipeTag tag in Tags)
             {

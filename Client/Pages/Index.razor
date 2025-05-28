@@ -4,27 +4,32 @@
 @page "/"
 
 <h3 style="text-align: center;">Recipe Collection</h3>
+<hr />
+
 @if (!_render)
 {
-    <div class="spinner-border" role="status" style="margin:5px;">
-        <span class="sr-only" style="padding-left: 10px;">Loading...</span>
+    <div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
+        <div class="spinner-border" role="status" style="margin:5px;">
+            <span class="sr-only" style="padding-left: 10px;">Loading...</span>
+        </div>
     </div>
 }
 else
 {
     if (isDBUp)
     {
-        <div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
-            <!-- Placeholder  area
-            <RecipeSummary Name="Bulgogi" Description="Korean marinated beef stir fry" Tags="@ExampleTags()" />
-            <RecipeSummary /> 
-            -->
+        <div id="divRecipes" class="flex-column" style="display: flex; align-items: center; overflow:auto; height:600px;">
             @if (recipes.Count == 0)
             {
                 <label>No Data</label>
             }
             else
             {
+                <!-- Placeholder  area
+                <RecipeSummary Name="Bulgogi" Description="Korean marinated beef stir fry" Tags="@ExampleTags()" />
+                <RecipeSummary /> 
+                <RecipeSummary /> 
+                -->
 
                 foreach (Recipe r in recipes)
                 {
@@ -32,29 +37,45 @@ else
                 }
             }
         </div>
-        <button @onclick="()=>{RecipeService.Test();}">Test</button>
-    }
+        <div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
+            <br/>
+            <sl-button size="large" @onclick="()=>{TraverseToAddPage();}">Add</sl-button>
+            <sl-button size="large" hidden @onclick="()=>{RecipeService.Test();}">Test</sl-button>
+        </div>
+        }
     else
-    {
-        <label>Database is down.</label>
+        {
+            <div id="divRecipes" class="flex-column" style="display: flex; align-items: center;">
+                <label>Database is down.</label>
+                <sl-button size="large" @onclick="()=>{CheckConnection();}">Refresh</sl-button>
+            </div>
+        }
     }
-}
 
-@code {
+    @code {
     public List<Recipe> recipes = new List<Recipe>();
     private bool _render = false;
     private bool isDBUp = false;
     protected override async Task OnInitializedAsync()
     {
-        isDBUp = await RecipeService.TestConnection();
+        await base.OnInitializedAsync();
+        CheckConnection();
+    }
 
+    private async void CheckConnection(){
+        _render = false;
+        StateHasChanged();
+
+        isDBUp = await RecipeService.TestConnection();
         if (isDBUp)
         {
             recipes = await RecipeService.GetRecipes();
         }
 
-        await base.OnInitializedAsync();
         _render = true;
         StateHasChanged();
+    }
+    private void TraverseToAddPage(){
+        nav.NavigateTo("RecipeEdit");
     }
 }

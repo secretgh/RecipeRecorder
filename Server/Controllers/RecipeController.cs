@@ -4,6 +4,7 @@ using RecipeRecorder.Shared;
 using Microsoft.EntityFrameworkCore;
 using static System.IO.File;
 using System.Text.Json;
+using static RecipeRecorder.Client.Service.RecipeService;
 
 namespace RecipeRecorder.Server.Controllers
 {
@@ -110,6 +111,67 @@ namespace RecipeRecorder.Server.Controllers
         {
             List<Ingredient> searchedIngredients = await _context.Ingredients.Where(i => i.IngredientName.Contains(search)).ToListAsync();
             return Ok(searchedIngredients);
+        }
+
+        [HttpGet("ingredients/page/{page}/{pageSize}")]
+        public async Task<ActionResult<PagedResult<Ingredient>>> GetPagedIngredients(int page=0, int pageSize=50)
+        {
+            var query = _context.Ingredients.OrderBy(i => i.IngredientName);
+            var total = await query.CountAsync();
+
+            var items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Ingredient>
+            {
+                Items = items,
+                TotalCount = total
+            };
+        }
+
+        [HttpGet("ingredients/{id}/recipes")]
+        public async Task<IActionResult> GetRecipesUsingIngredient(int id)
+        {
+            var recipes = await _context.Recipes
+                .Include(r => r.RecipeIngredients)
+                .Include(r => r.RecipeSteps)
+                .Include(r => r.RecipeTags)
+                .Where(r => r.RecipeIngredients.Any(ri => ri.IngId == id))
+                .ToListAsync();
+
+            return Ok(recipes);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddIngredient([FromBody] Ingredient ingredient)
+        {
+            _context.Ingredients.Add(ingredient);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetPagedIngredients), new { id = ingredient.Id }, ingredient);
+        }
+
+        [HttpPut("ingredients/{id}")]
+        public async Task<IActionResult> UpdateIngredient(int id, [FromBody] Ingredient updated)
+        {
+            var ingredient = await _context.Ingredients.FindAsync(id);
+            if (ingredient == null) return NotFound();
+
+            ingredient.IngredientName = updated.IngredientName;
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpDelete("ingredients/{id}")]
+        public async Task<IActionResult> DeleteIngredient(int id)
+        {
+            var ingredient = await _context.Ingredients.FindAsync(id);
+            if (ingredient == null) return NotFound();
+
+            _context.Ingredients.Remove(ingredient);
+            await _context.SaveChangesAsync();
+            return NoContent();
         }
 
         #region "Object CRUD"

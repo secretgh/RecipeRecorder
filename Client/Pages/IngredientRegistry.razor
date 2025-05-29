@@ -13,35 +13,42 @@
 </div>
 
 <Virtualize @key="refreshCounter" ItemsProvider="IngredientService.LoadIngredients" Context="ingredient" ItemSize="50">
-    <div class="ingredient-entry">
-        <strong>@ingredient.IngredientName</strong>
-        <sl-button @onclick="() => ToggleRecipesAsync(ingredient.Id)">
-            @(IngredientService.GetExpandedIngredients().Contains(ingredient.Id) ? "Hide Recipes" : "Show Recipes")
-        </sl-button>
-        <sl-button @onclick="() => EditIngredient(ingredient)">Edit</sl-button>
-        <sl-button @onclick="() => DeleteIngredient(ingredient.Id)">Delete</sl-button>
+    <div style="margin: 2px;">
+        <sl-card>
+            <div>
+                <strong slot="header">
+                    @ingredient.IngredientName
+                </strong>
+                <sub>Ingredient</sub>
+            </div>
+            <sl-button size="medium" @onclick="() => ToggleRecipesAsync(ingredient.Id)">
+                <small>@(IngredientService.GetExpandedIngredients().Contains(ingredient.Id) ? "Hide Recipes" : "Related Recipes")</small>
+            </sl-button>
+            <sl-button @onclick="() => EditIngredient(ingredient)">Edit</sl-button>
+            <sl-button @onclick="() => DeleteIngredient(ingredient.Id)">Delete</sl-button>
 
-        @if (IngredientService.GetExpandedIngredients().Contains(ingredient.Id))
-        {
-            @if (IngredientService.GetIngredientRecipes().TryGetValue(ingredient.Id, out var recipes))
+            @if (IngredientService.GetExpandedIngredients().Contains(ingredient.Id))
             {
-                <ul>
-                    @if(recipes.Count > 0){
-                        @foreach (var recipe in recipes)
-                        {
-                            <li>@recipe.RecipeName</li>
+                @if (IngredientService.GetIngredientRecipes().TryGetValue(ingredient.Id, out var recipes))
+                {
+                    <ul slot="footer">
+                        @if(recipes.Count > 0){
+                            @foreach (var recipe in recipes)
+                            {
+                                <li>@recipe.RecipeName</li>
+                            }
                         }
-                    }
-                    else{
-                        <li>No recipes using this ingredient</li>
-                    }
-                </ul>
+                        else{
+                            <li>No recipes using this ingredient</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p><em>Loading recipes...</em></p>
+                }
             }
-            else
-            {
-                <p><em>Loading recipes...</em></p>
-            }
-        }
+        </sl-card>
     </div>
 </Virtualize>
 

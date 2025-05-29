@@ -24,6 +24,8 @@ namespace RecipeRecorder.Client.Service
         Task AddIngredientAsync(Ingredient ingredient);
         Task UpdateIngredientAsync(Ingredient ingredient);
         Task DeleteIngredientAsync(int id);
+        Task<List<RecipeTag>> GetTags();
+        Task<List<Recipe>> GetFilteredRecipes(string search, List<int> tagIds);
         Task<bool> TestConnection();
         Task Test();
     }
@@ -48,7 +50,7 @@ namespace RecipeRecorder.Client.Service
         
         public async Task SaveRecipesToJson()
         {
-            await _httpClient.GetAsync("/SaveToJson");
+            await _httpClient.GetAsync("Api/Recipe/SaveToJson");
         }
 
         public async Task<bool> TestConnection() {

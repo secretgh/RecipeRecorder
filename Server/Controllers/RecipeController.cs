@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using static System.IO.File;
 using System.Text.Json;
 using static RecipeRecorder.Client.Service.RecipeService;
+using Azure;
 
 namespace RecipeRecorder.Server.Controllers
 {
@@ -58,7 +59,8 @@ namespace RecipeRecorder.Server.Controllers
             OkObjectResult task = (OkObjectResult)await GetRecipes();
             recipes = (List<Recipe>)task.Value;
             string json = JsonSerializer.Serialize(recipes);
-            System.IO.File.WriteAllText("./ExportedRecipes.json", json);
+            string path = "C:\\Users\\USER_NAME\\Downloads".Replace("USER_NAME", Environment.UserName);
+            System.IO.File.WriteAllText($"{path}/ExportedRecipes.json", json);
             Console.WriteLine("Successfully wrote ExportedRecipes.json");
             return Ok(json);
         }
@@ -172,6 +174,25 @@ namespace RecipeRecorder.Server.Controllers
             _context.Ingredients.Remove(ingredient);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        public async Task<List<Recipe>> GetFilteredRecipesAsync(string search, List<int> tagIds)
+        {
+            var query = _context.Recipes
+                .Include(r => r.RecipeTags)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+                query = query.Where(r => r.RecipeName.Contains(search));
+
+            if (tagIds?.Any() == true)
+                query = query.Where(r => r.RecipeTags.Any(t => tagIds.Contains(t.Id)));
+
+            return await query.ToListAsync();
+        }
+        public async Task<List<RecipeTag>> GetAllTagsAsync()
+        {
+            return await _context.RecipeTags.ToListAsync();
         }
 
         #region "Object CRUD"

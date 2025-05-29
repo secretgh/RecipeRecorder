@@ -1,4 +1,6 @@
 ﻿@inherits LayoutComponentBase
+@inject IJSRuntime JS
+@inject IRecipeService service
 
 <style>
     .drawer-placement-start::part(header-actions){
@@ -9,11 +11,6 @@
     pointer-events: inherit;
     }
 </style>
-<script>
-    function toast(){
-    $('#fileSave').toast()
-    }
-</script>
 <div class="page">
     <main>
         <sl-drawer 
@@ -31,6 +28,14 @@
                             <sl-button style="margin: 2px;">
                                 <span class="oi oi-list-rich" aria-hidden="true"></span>
                                 Collection of Recipes
+                            </sl-button>
+                        </NavLink>
+                    </div>
+                    <div class="nav-item">
+                        <NavLink href="ingredient-registry" @onclick="()=>{setOpen(false);}">
+                            <sl-button style="margin: 2px;">
+                                <span class="oi oi-list-rich" aria-hidden="true"></span>
+                                Ingredient Registry
                             </sl-button>
                         </NavLink>
                     </div>
@@ -58,7 +63,7 @@
                 </sl-button>
             </div>
             <div style="justify-content: end">
-                <sl-button @onclick="()=>{}">Save Data Locally</sl-button>
+                <sl-button @onclick="()=>{SaveToJson();}">Save Data Locally</sl-button>
                 <NavLink href="LoadData">
                     <sl-button>Load Data Locally</sl-button>
                 </NavLink>
@@ -69,15 +74,32 @@
             @Body
         </article>
     </main>
-    <sl-alert id="fileSave" variant="success" duration="3000" closable>
-        <sl-icon slot="icon" name="check2-circle"></sl-icon>
-        <strong>Your recipes have been saved.</strong>
-        <br />
-        The file is named ExportedRecipes.json.
-    </sl-alert>
 </div>
 
 @code {
+    private Lazy<IJSObjectReference> module = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = new(await JS.InvokeAsync<IJSObjectReference>("import", "./js/CustomJavaFunctions.js"));
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (module.IsValueCreated)
+        {
+            await module.Value.DisposeAsync();
+        }
+    }
+
+    private async Task SaveToJson(){
+        await service.SaveRecipesToJson();
+        await module.Value.InvokeVoidAsync("notify", "Your recipes have been saved.", "success");
+    }
+
     private bool open = false;
     private void setOpen(bool value)
     {

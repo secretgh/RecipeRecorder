@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RecipeRecorder.Domain\RecipeRecorder.Domain.csproj" />
+    <ProjectReference Include="..\RecipeRecorder.Infrastructure\RecipeRecorder.Infrastructure.csproj" />
+    <ProjectReference Include="..\RecipeRecorder.Shared\RecipeRecorder.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

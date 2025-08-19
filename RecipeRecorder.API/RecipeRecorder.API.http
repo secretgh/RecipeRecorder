@@ -1,0 +1,124 @@
+@RecipeRecorder.API_HostAddress = http://localhost:5135
+
+GET {{RecipeRecorder.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+# ----------------------------
+# Get all recipes
+# ----------------------------
+GET {{RecipeRecorder.API_HostAddress}}/api/recipes
+Accept: application/json
+
+###
+
+# ----------------------------
+# Get a recipe by ID
+# ----------------------------
+GET {{RecipeRecorder.API_HostAddress}}/api/recipes/1
+Accept: application/json
+
+###
+
+# ----------------------------
+# Create a new recipe
+# ----------------------------
+POST {{RecipeRecorder.API_HostAddress}}/api/recipes
+Content-Type: application/json
+
+{
+  "recipeName": "Chocolate Cake",
+  "recipeDesc": "Delicious dark chocolate cake",
+  "ingredients": [
+    {
+      "ingId": 0,
+      "recipeId": 0,
+      "ingredientNameModifier": "chopped",
+      "quantity": 200,
+      "quantityDesc": "grams",
+      "ingredient": {
+        "id": 1,
+        "ingredientName": "Chocolate"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": 0,
+      "recipeId": 0,
+      "instruction": "Preheat oven to 180C",
+      "subText": null
+    },
+    {
+      "id": 0,
+      "recipeId": 0,
+      "instruction": "Mix ingredients and bake for 30 mins",
+      "subText": null
+    }
+  ],
+  "tags": [
+    {
+      "id": 0,
+      "recipeId": 0,
+      "tag": "Dessert"
+    }
+  ]
+}
+
+###
+
+# ----------------------------
+# Update an existing recipe
+# ----------------------------
+PUT {{RecipeRecorder.API_HostAddress}}/api/recipes/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "recipeName": "Updated Chocolate Cake",
+  "recipeDesc": "Even more delicious",
+  "ingredients": [
+    {
+      "ingId": 1,
+      "recipeId": 1,
+      "ingredientNameModifier": "melted",
+      "quantity": 250,
+      "quantityDesc": "grams",
+      "ingredient": {
+        "id": 1,
+        "ingredientName": "Chocolate"
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": 1,
+      "recipeId": 1,
+      "instruction": "Preheat oven to 180C",
+      "subText": null
+    },
+    {
+      "id": 2,
+      "recipeId": 1,
+      "instruction": "Mix ingredients and bake for 35 mins",
+      "subText": null
+    }
+  ],
+  "tags": [
+    {
+      "id": 1,
+      "recipeId": 1,
+      "tag": "Dessert"
+    }
+  ]
+}
+
+###
+
+# ----------------------------
+# Delete a recipe
+# ----------------------------
+DELETE {{RecipeRecorder.API_HostAddress}}/api/recipes/1
+
+###

@@ -42,7 +42,9 @@ namespace RecipeRecorder.Infrastructure
             modelBuilder.Entity<Ingredient>(entity =>
             {
                 entity.HasKey(i => i.Id);
+                entity.Property(i => i.NormalizedName).IsRequired();
                 entity.Property(i => i.IngredientName).IsRequired();
+                entity.HasIndex(i => i.NormalizedName).IsUnique();
             });
 
             // RecipeIngredient

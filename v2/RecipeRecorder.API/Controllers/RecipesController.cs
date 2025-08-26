@@ -49,5 +49,12 @@ namespace RecipeRecorder.API.Controllers
             return success ? NoContent() : NotFound();
         }
 
+
+        [HttpGet("/api/ingredients/search")]
+        public async Task<IEnumerable<IngredientDto>> SearchIngredients(string query, int limit=10)
+        {
+            var ingredients = await _service.SearchIngredientsAsync(query, limit);
+            return ingredients; 
+        }
     }
 }

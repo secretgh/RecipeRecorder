@@ -8,12 +8,15 @@ namespace RecipeRecorder.Application.Services
     public class RecipeAPIService : IRecipeService
     {
         private readonly IRecipeRepo _repository;
+        private readonly IIngredientRepo _ingredientRepository;
 
-        public RecipeAPIService(IRecipeRepo repository)
+        public RecipeAPIService(IRecipeRepo repository, IIngredientRepo ingredientRepo)
         {
             _repository = repository;
+            _ingredientRepository = ingredientRepo;
         }
 
+        //Recipe
         public async Task<IEnumerable<RecipeDto>> GetAllAsync()
         {
             var recipes = await _repository.GetAllAsync();
@@ -35,7 +38,7 @@ namespace RecipeRecorder.Application.Services
 
             foreach (var ri in dto.Ingredients)
             {
-                var ingredient = new Ingredient(ri.Ingredient.IngredientName);
+                var ingredient = await _ingredientRepository.GetOrCreateAsync(ri.Ingredient.IngredientName);
                 recipe.AddIngredient(new RecipeIngredient(ingredient, ri.Quantity, ri.QuantityDesc, ri.IngredientNameModifier));
             }
 
@@ -95,6 +98,21 @@ namespace RecipeRecorder.Application.Services
             await _repository.DeleteAsync(id);
             return true;
         }
+
+        //Ingredient
+        public async Task<List<IngredientDto>> SearchIngredientsAsync(string query, int limit = 10)
+        {
+            var results = await _ingredientRepository.SearchAsync(query, limit);
+
+            return results
+                .Select(i => new IngredientDto
+                {
+                    Id = i.Id,
+                    IngredientName = i.IngredientName
+                })
+                .ToList();
+        }
+
 
         // 🔹 Helper to centralize mapping
         private static RecipeDto MapToDto(Recipe r)

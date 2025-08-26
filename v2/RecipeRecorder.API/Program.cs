@@ -13,6 +13,7 @@ builder.Services.AddDbContext<RecipeDbContext>(options =>
 
 // Register custom interfaces
 builder.Services.AddScoped<IRecipeRepo, RecipeRepo>();
+builder.Services.AddScoped<IIngredientRepo, IngredientRepo>();
 builder.Services.AddScoped<IRecipeService, RecipeAPIService>();
 
 builder.Services.AddControllers();

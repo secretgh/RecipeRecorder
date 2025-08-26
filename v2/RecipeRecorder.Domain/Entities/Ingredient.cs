@@ -7,8 +7,11 @@ public class Ingredient
     private string _ingredientName = null!;
     public string IngredientName => _ingredientName;
 
+    // Used internally to enforce uniqueness
+    public string NormalizedName { get; set; } = string.Empty;
+
     // EF constructor
-    private Ingredient() { }
+    public Ingredient() { }
 
     // Constructor enforces required fields
     public Ingredient(string ingredientName)
@@ -17,6 +20,7 @@ public class Ingredient
             throw new ArgumentException("Ingredient name cannot be empty.", nameof(ingredientName));
 
         _ingredientName = ingredientName;
+        NormalizedName = NormalizeString(ingredientName);
     }
 
     // Method to update ingredient name while enforcing rules
@@ -26,5 +30,10 @@ public class Ingredient
             throw new ArgumentException("Ingredient name cannot be empty.", nameof(newName));
 
         _ingredientName = newName;
+    }
+
+    private static string NormalizeString(string name)
+    {
+        return name.Trim().ToLowerInvariant();
     }
 }

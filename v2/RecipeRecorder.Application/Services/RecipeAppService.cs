@@ -42,5 +42,10 @@ namespace RecipeRecorder.Application.Services
             var response = await _client.DeleteAsync($"api/recipes/{id}");
             return response.IsSuccessStatusCode;
         }
+
+        public async Task<List<IngredientDto>> SearchIngredientsAsync(string query, int limit)
+        {
+            return await _client.GetFromJsonAsync<List<IngredientDto>>($"api/ingredients/search?query={query}&limit={limit}") ?? new List<IngredientDto>();
+        }
     }
 }

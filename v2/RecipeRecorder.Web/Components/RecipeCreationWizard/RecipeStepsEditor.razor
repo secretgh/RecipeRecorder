@@ -1,0 +1,106 @@
+﻿@using RecipeRecorder.Web.Components
+@* RecipeStepsEditor.razor *@
+<div class="recipe-steps-editor">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Recipe Steps</h4>
+        <button type="button" class="btn btn-outline-primary" @onclick="AddStep">
+            <i class="bi bi-plus-circle me-1"></i> Add Step
+        </button>
+    </div>
+
+    @for (int i = 0; i < steps.Count; i++)    {        
+        int stepIndex = i; 
+        // Capture for closure        
+        <div class="step-container position-relative">
+            <StepTextBox StepNumber="@(stepIndex + 1)" Text="@steps[stepIndex].Text"
+                TextChanged="@(async (text) => {await UpdateStepText(stepIndex, text);})"
+                OnStepParsed="@(async (data) => {await UpdateParsedData(stepIndex, data);})" />
+            @if (steps.Count > 1)
+            {
+                <button type="button" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0"
+                    @onclick="() => RemoveStep(stepIndex)" style="margin-top: 0.25rem; margin-right: 0.25rem;">
+                    <i class="bi bi-x"></i>
+                </button>
+            }
+        </div>
+    }    
+    @if (AllParsedIngredients.Any() || AllParsedTimes.Any())    {        
+        <div class="mt-4 p-3 bg-light rounded">           
+            <h6>Summary of Detected Elements:</h6>            
+            <div class="row">                
+                @if (AllParsedIngredients.Any())                {                    
+                    <div class="col-md-6">                        
+                        <strong>Ingredients (@AllParsedIngredients.Count):</strong>                        
+                        <div class="mt-1">                            
+                            @foreach (var ingredient in AllParsedIngredients.Distinct()){                                
+                                <span class="badge bg-success me-1 mb-1">#@ingredient</span>                            
+                            }                        
+                        </div>                    
+                    </div>                
+                }                                
+                @if (AllParsedTimes.Any()){                    
+                    <div class="col-md-6"><strong>Times (@AllParsedTimes.Count):</strong>
+                        <div class="mt-1">                            
+                            @foreach (var time in AllParsedTimes.Distinct()){                                
+                                <span class="badge bg-info me-1 mb-1">@@@time</span>                            
+                            }                        
+                        </div>                    
+                    </div>                
+                }            
+            </div>        
+        </div>    
+    }
+</div>
+@code {   
+    [Parameter] public List<RecipeStepWizardData> Steps { get; set; } = new();    
+    [Parameter] public EventCallback<List<RecipeStepWizardData>> StepsChanged { get; set; }    
+    private List<RecipeStepWizardData> steps = new();        
+    public List<string> AllParsedIngredients => steps .SelectMany(s => s.ParsedData?.Ingredients ?? new List<string>()) .ToList();        
+    public List<string> AllParsedTimes => steps .SelectMany(s => s.ParsedData?.Times ?? new List<string>()) .ToList();    
+    protected override void OnInitialized(){       
+        if (!Steps.Any()){            
+            steps.Add(new RecipeStepWizardData { Text = "", StepNumber = 1 });        
+        }        
+        else{            
+            steps = Steps.Select(s => new RecipeStepWizardData{
+                Text = s.Text,StepNumber = s.StepNumber,ParsedData = s.ParsedData
+                }).ToList();
+        }    
+    }    
+    private async Task UpdateStepText(int index, string text)    {        
+        if (index < steps.Count)        
+        {            
+            steps[index].Text = text;            
+            await NotifyStepsChanged();        
+        }    
+    }    
+    private async Task UpdateParsedData(int index, ParsedStepData parsedData)    {        
+        if (index < steps.Count)        {            
+            steps[index].ParsedData = parsedData;            
+            await NotifyStepsChanged();        
+            }    
+    }    
+    private async Task AddStep()    {        
+        steps.Add(new RecipeStepWizardData{Text = "",StepNumber = steps.Count + 1});  
+        // Renumber steps
+        for (int i = 0; i < steps.Count; i++){
+            steps[i].StepNumber = i + 1;
+        }                
+        await NotifyStepsChanged();    
+    }    
+    private async Task RemoveStep(int index)    {
+        if (steps.Count > 1 && index < steps.Count){            
+            steps.RemoveAt(index);                        
+            // Renumber remaining steps            
+            for (int i = 0; i < steps.Count; i++)            
+            {
+                steps[i].StepNumber = i + 1;
+            }                        
+            await NotifyStepsChanged();        
+        }    
+    }    
+    private async Task NotifyStepsChanged()    {        
+        await StepsChanged.InvokeAsync(steps);        
+        StateHasChanged();    
+    }
+}

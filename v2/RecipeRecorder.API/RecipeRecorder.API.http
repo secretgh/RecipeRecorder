@@ -1,4 +1,4 @@
-@RecipeRecorder.API_HostAddress = http://localhost:5135
+@RecipeRecorder.API_HostAddress = https://localhost:7187
 
 GET {{RecipeRecorder.API_HostAddress}}/weatherforecast/
 Accept: application/json
@@ -120,5 +120,8 @@ Content-Type: application/json
 # Delete a recipe
 # ----------------------------
 DELETE {{RecipeRecorder.API_HostAddress}}/api/recipes/1
+
+###
+GET {{RecipeRecorder.API_HostAddress}}/api/recipes
 
 ###

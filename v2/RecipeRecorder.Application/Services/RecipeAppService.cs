@@ -7,15 +7,19 @@ namespace RecipeRecorder.Application.Services
     public class RecipeAppService : IRecipeService
     {
         private readonly HttpClient _client;
+        private readonly Uri APIBaseAddress = new Uri("https://localhost:7187/");
 
         public RecipeAppService(HttpClient client)
         {
             _client = client;
+            _client.BaseAddress = APIBaseAddress;
         }
 
-        public async Task<IEnumerable<RecipeDto>> GetAllAsync()
+        public async Task<List<RecipeDto>> GetAllAsync()
         {
-            return await _client.GetFromJsonAsync<IEnumerable<RecipeDto>>("api/recipes") ?? Array.Empty<RecipeDto>();
+            List<RecipeDto> recipes = new List<RecipeDto>();
+            recipes = await _client.GetFromJsonAsync<List<RecipeDto>>("api/recipes") ?? recipes;
+            return recipes;
         }
 
         public async Task<RecipeDto?> GetByIdAsync(int id)

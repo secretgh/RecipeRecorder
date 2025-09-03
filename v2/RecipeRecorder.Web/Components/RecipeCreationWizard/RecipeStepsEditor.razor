@@ -3,9 +3,6 @@
 <div class="recipe-steps-editor">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Recipe Steps</h4>
-        <button type="button" class="btn btn-outline-primary" @onclick="AddStep">
-            <i class="bi bi-plus-circle me-1"></i> Add Step
-        </button>
     </div>
 
     @for (int i = 0; i < steps.Count; i++)    {        
@@ -15,6 +12,9 @@
             <StepTextBox StepNumber="@(stepIndex + 1)" Text="@steps[stepIndex].Text"
                 TextChanged="@(async (text) => {await UpdateStepText(stepIndex, text);})"
                 OnStepParsed="@(async (data) => {await UpdateParsedData(stepIndex, data);})" />
+            <button type="button" class="btn btn-outline-primary" @onclick="AddStep">
+                <i class="bi bi-plus-circle me-1"></i> Add Step
+            </button>
             @if (steps.Count > 1)
             {
                 <button type="button" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0"
@@ -33,7 +33,7 @@
                         <strong>Ingredients (@AllParsedIngredients.Count):</strong>                        
                         <div class="mt-1">                            
                             @foreach (var ingredient in AllParsedIngredients.Distinct()){                                
-                                <span class="badge bg-success me-1 mb-1">#@ingredient</span>                            
+                                <span class="badge bg-success me-1 mb-1">@ingredient</span>                            
                             }                        
                         </div>                    
                     </div>                
@@ -42,7 +42,7 @@
                     <div class="col-md-6"><strong>Times (@AllParsedTimes.Count):</strong>
                         <div class="mt-1">                            
                             @foreach (var time in AllParsedTimes.Distinct()){                                
-                                <span class="badge bg-info me-1 mb-1">@@@time</span>                            
+                                <span class="badge bg-info me-1 mb-1">@time</span>                            
                             }                        
                         </div>                    
                     </div>                

@@ -81,7 +81,7 @@
             <div class="section-edit-panel h-100">
                 @if (selectedSection == "description")
                 {
-                    <DescriptionEditor Description="@RecipeData.Description" DescriptionChanged="@OnDescriptionChanged" />
+                    <DescriptionEditor Description="@RecipeData.Description" DescriptionChanged="@OnDescriptionChanged" RecipeTags="@RecipeData.Recipe.Tags" RecipeTagsChanged="@OnRecipeTagsChanged" />
                 }
                 else if (selectedSection == "steps")
                 {
@@ -95,35 +95,48 @@
         </div>
     </div>
 </div>
-@code {    
+@code {
     [Parameter] public RecipeWizardData RecipeData { get; set; } = new();
     [Parameter] public EventCallback<RecipeWizardData> RecipeDataChanged { get; set; }
     private string selectedSection = "description";
     private List<string> allParsedIngredients = new();    
-        protected override void OnInitialized()    {        
-            UpdateParsedIngredients();    
-        }    
-        protected override void OnParametersSet()    {        
-            UpdateParsedIngredients();    
-        }    
-        private void UpdateParsedIngredients()    {
-            allParsedIngredients = RecipeData.WizardSteps .SelectMany(s => s.ParsedData?.Ingredients ?? new List<string>()) .Distinct() .ToList();    
-        }    
-        private void SelectSection(string section)    {
-            selectedSection = section;
-            StateHasChanged();    
-        }    
-        private async Task OnDescriptionChanged(string description){        
-            RecipeData.Description = description;        
-            await RecipeDataChanged.InvokeAsync(RecipeData);    
-        }    
-        private async Task OnWizardStepsChanged(List<RecipeStepWizardData> wizardSteps)    {
-            RecipeData.WizardSteps = wizardSteps;
-            UpdateParsedIngredients();        
-            await RecipeDataChanged.InvokeAsync(RecipeData);    
-        }    
-        private async Task OnRecipeIngredientsChanged(List<RecipeIngredientDto> ingredients)    {
-            RecipeData.Recipe.Ingredients = ingredients;
-            await RecipeDataChanged.InvokeAsync(RecipeData);    
-            }
+
+    protected override void OnInitialized()    {        
+        UpdateParsedIngredients();    
+    }    
+
+    protected override void OnParametersSet()    {        
+        UpdateParsedIngredients();    
+    }    
+
+    private void UpdateParsedIngredients()    {
+        allParsedIngredients = RecipeData.WizardSteps.SelectMany(s => s.ParsedData?.Ingredients ?? new List<string>()).Distinct().ToList();    
+    }    
+
+    private void SelectSection(string section)    {
+        selectedSection = section;
+        StateHasChanged();    
+    }    
+
+    private async Task OnDescriptionChanged(string description){        
+        RecipeData.Description = description;        
+        await RecipeDataChanged.InvokeAsync(RecipeData);    
+    }    
+
+    private async Task OnWizardStepsChanged(List<RecipeStepWizardData> wizardSteps)    {
+        RecipeData.WizardSteps = wizardSteps;
+        UpdateParsedIngredients();
+        RecipeData.Recipe.Steps = RecipeData.ConvertStepsToDto();
+        await RecipeDataChanged.InvokeAsync(RecipeData);    
+    }    
+
+    private async Task OnRecipeIngredientsChanged(List<RecipeIngredientDto> ingredients)    {
+        RecipeData.Recipe.Ingredients = ingredients;
+        await RecipeDataChanged.InvokeAsync(RecipeData);    
+    }
+    private async Task OnRecipeTagsChanged(List<RecipeTagDto> tags)
+    {
+        RecipeData.Recipe.Tags = tags;
+        await RecipeDataChanged.InvokeAsync(RecipeData);
+    }
 }

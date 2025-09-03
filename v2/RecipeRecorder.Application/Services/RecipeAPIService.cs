@@ -17,11 +17,12 @@ namespace RecipeRecorder.Application.Services
         }
 
         //Recipe
-        public async Task<IEnumerable<RecipeDto>> GetAllAsync()
+        public async Task<List<RecipeDto>> GetAllAsync()
         {
             var recipes = await _repository.GetAllAsync();
 
-            return recipes.Select(MapToDto);
+            IEnumerable<RecipeDto> dtos = recipes.Select(MapToDto);
+            return dtos.ToList();
         }
 
         public async Task<RecipeDto?> GetByIdAsync(int id)

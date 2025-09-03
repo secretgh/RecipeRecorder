@@ -4,7 +4,7 @@ namespace RecipeRecorder.Application.Interfaces
 {
     public interface IRecipeService
     {
-        Task<IEnumerable<RecipeDto>> GetAllAsync();
+        Task<List<RecipeDto>> GetAllAsync();
         Task<RecipeDto?> GetByIdAsync(int id);
         Task<RecipeDto> CreateAsync(RecipeDto dto);
         Task<bool> UpdateAsync(int id, RecipeDto dto);

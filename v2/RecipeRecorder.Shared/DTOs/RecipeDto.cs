@@ -15,5 +15,17 @@ namespace RecipeRecorder.Shared.DTOs
         public List<RecipeIngredientDto> Ingredients { get; set; } = new();
         public List<RecipeStepDto> Steps { get; set; } = new();
         public List<RecipeTagDto> Tags { get; set; } = new();
+
+        public override string ToString()
+        {
+            string result = "";
+            result = $"{RecipeName} | ";
+            foreach(RecipeTagDto tag in Tags)
+            {
+                result += $"{tag.Tag} ";
+            }
+
+            return result;
+        }
     }
 }

@@ -1,3 +1,18 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager nav
 
+<div style="display:flex; flex-direction:row;">
+    <button class="btn btn-outline-primary" @onclick="@(() => Navigate(""))">Home</button>
+    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/recipes"))">Recipes</button>
+    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/collections"))">Collections</button>
+    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/ingredients"))">Ingredients</button>
+    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/config"))">Config</button>
+</div>
 @Body
+
+@code {
+    private void Navigate(string uri)
+    {
+        nav.NavigateTo(uri);
+    }
+}

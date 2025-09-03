@@ -18,7 +18,25 @@ builder.Services.AddScoped<IRecipeService, RecipeAPIService>();
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(
+    options =>
+    {
+        options.AddPolicy(
+            name: "AllowedOrigins",
+            policy =>
+            {
+                policy.WithOrigins(
+                    "https://localhost:7187",
+                    "https://localhost:7063"
+                ).AllowAnyHeader().AllowAnyMethod();
+            }
+        );
+    }    
+);
+
 var app = builder.Build();
+
+app.UseCors("AllowedOrigins");
 
 app.UseHttpsRedirection();
 

@@ -1,5 +1,6 @@
 ﻿@using RecipeRecorder.Web.Components.RecipeCreationWizard
 @using RecipeRecorder.Web.Components.RecipeCreationWizard.SectionEditor
+@inject NavigationManager nav
 <div class="recipe-creation-wizard">
     <div class="wizard-header mb-4">
         <div class="progress mb-3">
@@ -63,8 +64,9 @@
         }    
     </div>
 </div>
-@code {    
-    [Parameter] public EventCallback<RecipeWizardData> OnRecipeSaved { get; set; }    
+
+@code {
+    [Parameter] public EventCallback<RecipeWizardData> OnRecipeSaved { get; set; }  
     private int currentStep = 1;    
     private const int totalSteps = 2;    
     private RecipeWizardData recipeData = new();    
@@ -102,7 +104,8 @@
     private async Task SaveRecipe()    {        
         if (CanSaveRecipe())        
         {            
-            await OnRecipeSaved.InvokeAsync(recipeData);        
+            await OnRecipeSaved.InvokeAsync(recipeData);
+            nav.NavigateTo("/recipes");
         }    
     }
 }

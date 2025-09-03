@@ -64,11 +64,12 @@
         <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.100" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.100" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.8" />
+        <PackageReference Include="System.Private.Uri" Version="4.3.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\RecipeRecorder.Application\RecipeRecorder.Application.csproj" />
-      <ProjectReference Include="..\RecipeRecorder.Infrustructure\RecipeRecorder.Infrastructure.csproj" />
+      <ProjectReference Include="..\RecipeRecorder.Infrastructure\RecipeRecorder.Infrastructure.csproj" />
       <ProjectReference Include="..\RecipeRecorder.Shared\RecipeRecorder.Shared.csproj" />
     </ItemGroup>
 

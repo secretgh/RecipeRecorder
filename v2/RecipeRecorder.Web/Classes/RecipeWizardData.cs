@@ -6,6 +6,16 @@ public class RecipeWizardData
     public RecipeDto Recipe { get; set; } = new();
     public List<RecipeStepWizardData> WizardSteps { get; set; } = new();
     
+    public List<RecipeStepDto> ConvertStepsToDto()
+    {
+        List<RecipeStepDto> steps = new List<RecipeStepDto>();
+        foreach(RecipeStepWizardData data in WizardSteps)
+        {
+            steps.Add(data.ToDto(Recipe.Id));
+        }
+        return steps;
+    }
+
     // Helper properties for wizard
     public string Name 
     { 

@@ -1,6 +1,39 @@
-﻿@page "/recipes"
+﻿@using RecipeRecorder.Application.Interfaces
+@using RecipeRecorder.Shared.DTOs
+@inject IRecipeService service
+@inject NavigationManager nav
+@page "/recipes"
+
 <PageTitle>Recipes</PageTitle>
 <h3>Recipe List Page (WIP)</h3>
-@code {
+<button class="btn btn-outline-primary" @onclick="@(()=>nav.NavigateTo("recipes/create"))">Create Recipe</button>
+<button class="btn btn-outline-dark">Show Filters</button>
+<br />
+<div id="divRecipes">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Recipe Name</th>
+                <th>Tag</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach(RecipeDto recipe in recipes){
+            <tr>
+                <td>@recipe.RecipeName</td>
+                <td>@string.Join(", ", recipe.Tags.Select(t => t.Tag))</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
 
+@code{
+    private List<RecipeDto> recipes = new List<RecipeDto>();
+
+    protected override async void OnInitialized()
+    {
+        recipes = await service.GetAllAsync();
+        StateHasChanged();
+    }
 }

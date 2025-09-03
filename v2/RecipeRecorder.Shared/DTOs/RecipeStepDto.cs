@@ -6,5 +6,9 @@
         public int RecipeId { get; set; }
         public string Instruction { get; set; } = null!; // required
         public string? SubText { get; set; }             // optional
+        public override string ToString()
+        {
+            return $"{Instruction}";
+        }
     }
 }

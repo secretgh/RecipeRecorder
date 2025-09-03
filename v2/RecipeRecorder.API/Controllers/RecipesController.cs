@@ -18,8 +18,9 @@ namespace RecipeRecorder.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<RecipeDto>> GetAll()
-            => await _service.GetAllAsync();
+        public async Task<ActionResult<List<RecipeDto>>> GetAll() {
+            return await _service.GetAllAsync();
+        } 
 
         [HttpGet("{id}")]
         public async Task<ActionResult<RecipeDto>> Get(int id)

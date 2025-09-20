@@ -15,11 +15,11 @@ public partial class Recipe
 
     [StringLength(50)]
     [Unicode(false)]
-    public string RecipeName { get; set; } = null!;
+    public string RecipeName { get; set; } = "";
 
     [StringLength(255)]
     [Unicode(false)]
-    public string? RecipeDesc { get; set; }
+    public string RecipeDesc { get; set; } = "";
 
     public virtual List<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
 

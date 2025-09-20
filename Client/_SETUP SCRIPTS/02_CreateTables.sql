@@ -31,4 +31,5 @@ create table RecipeIngredients(
 	QuantityDesc varchar(40) null
 	Primary key(IngID, RecipeID)
 );
+GO
 

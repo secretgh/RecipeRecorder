@@ -1,0 +1,37 @@
+# Stage 1: Initialize SQL Server with schema
+FROM mcr.microsoft.com/mssql/server:2022-latest as builder
+
+# Environment variables required by SQL Server
+ENV ACCEPT_EULA=Y \
+    MSSQL_SA_PASSWORD=P@ssword! \
+    MSSQL_PID=Evaluation
+
+# Copy schema SQL file into container
+COPY 02_CreateTables.sql /tmp/02_CreateTables.sql
+COPY 02a_CreateTables.sql /tmp/02a_CreateTables.sql
+
+# Start SQL Server, wait, apply schema, then stop
+RUN /opt/mssql/bin/sqlservr & \
+    sleep 25 && \
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "CREATE DATABASE DEV" && \
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -i /tmp/02_CreateTables.sql && \
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -Q "CREATE DATABASE [DEV-01]" && \
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -i /tmp/02a_CreateTables.sql && \
+    pkill sqlservr
+
+# Save initialized DB files
+RUN cp -a /var/opt/mssql /tmp/mssql-initialized
+
+# Stage 2: Final image
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+ENV ACCEPT_EULA=Y \
+    MSSQL_SA_PASSWORD=P@ssword! \
+    MSSQL_PID=Evaluation
+
+# Copy pre-initialized database into final image
+COPY --from=builder /tmp/mssql-initialized /var/opt/mssql
+
+EXPOSE 1433
+
+CMD ["/opt/mssql/bin/sqlservr"]

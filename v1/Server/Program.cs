@@ -7,7 +7,8 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<DevContext>(options => options.UseSqlServer("Data Source=localhost,1433; database=DEV; User ID=sa;Password=P@ssword!;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;"));
+var connectionString = builder.Configuration.GetConnectionString("local");
+builder.Services.AddDbContext<DevContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(x => 
     {

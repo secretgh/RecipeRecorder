@@ -115,23 +115,6 @@ namespace RecipeRecorder.Server.Controllers
             return Ok(searchedIngredients);
         }
 
-        [HttpGet("ingredients/page/{page}/{pageSize}")]
-        public async Task<ActionResult<PagedResult<Ingredient>>> GetPagedIngredients(int page=0, int pageSize=50)
-        {
-            var query = _context.Ingredients.OrderBy(i => i.IngredientName);
-            var total = await query.CountAsync();
-
-            var items = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new PagedResult<Ingredient>
-            {
-                Items = items,
-                TotalCount = total
-            };
-        }
 
         [HttpGet("ingredients/{id}/recipes")]
         public async Task<IActionResult> GetRecipesUsingIngredient(int id)
@@ -146,13 +129,6 @@ namespace RecipeRecorder.Server.Controllers
             return Ok(recipes);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddIngredient([FromBody] Ingredient ingredient)
-        {
-            _context.Ingredients.Add(ingredient);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetPagedIngredients), new { id = ingredient.Id }, ingredient);
-        }
 
         [HttpPut("ingredients/{id}")]
         public async Task<IActionResult> UpdateIngredient(int id, [FromBody] Ingredient updated)

@@ -303,7 +303,7 @@ namespace RecipeRecorder.Server.Controllers
             }
             else
             {
-                _context.Recipes.Entry(r).State = EntityState.Modified;
+                _context.Recipes.Update(r);
             }
             foreach (RecipeTag t in r.RecipeTags)
             {
@@ -313,7 +313,7 @@ namespace RecipeRecorder.Server.Controllers
                 }
                 else
                 {
-                    _context.RecipeTags.Entry(t).State = EntityState.Modified;
+                    _context.RecipeTags.Update(t);
                 }
             }
 
@@ -326,7 +326,7 @@ namespace RecipeRecorder.Server.Controllers
                 }   
                 else
                 {
-                    _context.RecipeSteps.Entry(s).State = EntityState.Modified;
+                    _context.RecipeSteps.Update(s);
                 }
             }
 
@@ -338,7 +338,7 @@ namespace RecipeRecorder.Server.Controllers
                 }
                 else
                 {
-                    _context.RecipeIngredients.Entry(i).State = EntityState.Modified;
+                    _context.RecipeIngredients.Update(i);
                 }
             }
 

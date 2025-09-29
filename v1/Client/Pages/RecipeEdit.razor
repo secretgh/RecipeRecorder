@@ -46,7 +46,7 @@
                 placeholder="Tag" 
                 @onkeyup="TagEnterKeyPressed" />
             </div>
-            
+
 
             <div style="display:flex; flex-direction:row; justify-content:center;">
                 @{
@@ -102,11 +102,10 @@
                         <br />
                         <label>Ingredient Name:</label>
                         <BlazoredTypeahead  
-                            SearchMethod="SearchIngredients" 
-                            @bind-Value="selectedIngredient"
-                            AddItemOnEmptyResultMethod="AddIngredientLookUp" 
-                            @onblur="()=>AddIngredientLookUp()"
-                            placeholder="Type here to search or hit enter to add new ingredient"
+                        SearchMethod="SearchIngredients" 
+                        @bind-Value="selectedIngredient"
+                        AddItemOnEmptyResultMethod="AddIngredientLookUp" 
+                        placeholder="Type here to search or hit enter to add new ingredient"
                         >
                             <SelectedTemplate>
                                 @if (context != null)
@@ -372,6 +371,7 @@
             if(Model.RecipeIngredients.Any(i => i.IngId == ingredient.IngId && i.Ing != null))
             {
                 Console.WriteLine("[TEST] i.ingid and ing is null - aka modifying existing ingredient");
+                ingredient.Ing = selectedIngredient;
                 int i = Model.RecipeIngredients.IndexOf(ingredient);
                 Model.RecipeIngredients[i] = ingredient;
             }
@@ -479,8 +479,7 @@
         {
             Ingredient i = await RecipeService.CreateIngredient(new Ingredient { IngredientName = searchText, Id=0 });
             selectedIngredient = i;
-            ingredient.Ing.IngredientName = i.IngredientName;
-            StateHasChanged();
+            ingredient.Ing = i;
             return i;
         }
         return null;

@@ -23,6 +23,17 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API Name", Version = "v1" });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("https://localhost:7100","http://localhost:5071" ,"http://localhost:5071", "http://localhost:11951") // Replace with your Blazor app's origin
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -40,6 +51,7 @@ else
     app.UseHsts();
 }
 
+app.UseCors();
 app.MapControllers();
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();

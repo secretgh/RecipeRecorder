@@ -2,10 +2,7 @@
 using Microsoft.Data.SqlClient;
 using RecipeRecorder.Shared;
 using Microsoft.EntityFrameworkCore;
-using static System.IO.File;
 using System.Text.Json;
-using static RecipeRecorder.Client.Service.RecipeService;
-using Azure;
 
 namespace RecipeRecorder.Server.Controllers
 {
@@ -129,7 +126,6 @@ namespace RecipeRecorder.Server.Controllers
             return Ok(recipes);
         }
 
-
         [HttpPut("ingredients/{id}")]
         public async Task<IActionResult> UpdateIngredient(int id, [FromBody] Ingredient updated)
         {
@@ -150,6 +146,38 @@ namespace RecipeRecorder.Server.Controllers
             _context.Ingredients.Remove(ingredient);
             await _context.SaveChangesAsync();
             return NoContent();
+        }
+
+        public class PagedResult<T>
+        {
+            public List<T> Items { get; set; } = [];
+            public int TotalCount { get; set; }
+        }
+
+        [HttpGet("ingredients/page/{page}/{pageSize}")]
+        public async Task<ActionResult<PagedResult<Ingredient>>> GetPagedIngredients(int page = 1, int pageSize = 50)
+        {
+            var query = _context.Ingredients.OrderBy(i => i.IngredientName);
+            var total = await query.CountAsync();
+
+            List<Ingredient> items = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Ingredient>
+            {
+                Items = items,
+                TotalCount = total
+            };
+        }
+
+        [HttpPost("ingredients/page")]
+        public async Task<IActionResult> AddIngredient([FromBody] Ingredient ingredient)
+        {
+            _context.Ingredients.Add(ingredient);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetPagedIngredients), new { id = ingredient.Id }, ingredient);
         }
 
         public async Task<List<Recipe>> GetFilteredRecipesAsync(string search, List<int> tagIds)

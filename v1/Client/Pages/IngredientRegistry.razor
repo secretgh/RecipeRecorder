@@ -4,7 +4,7 @@
 <h2>Ingredient Registry</h2>
 
 <div class="form-inline mb-4">
-    <input type="text" @bind="NewIngredientName" placeholder="New or updated ingredient name" />
+    <input type="text" @bind="NewIngredientName" placeholder="New or updated ingredient name" style="width:245px;" @onkeyup="EnterKeyPressed"/>
     <sl-button @onclick="SaveIngredient">@(EditingIngredientId.HasValue ? "Update" : "Add")</sl-button>
     @if (EditingIngredientId.HasValue)
     {
@@ -107,5 +107,13 @@
         await IngredientService.DeleteIngredientAsync(id);
         refreshCounter++;
         StateHasChanged(); // Or refetch virtualize
+    }
+
+    private async void EnterKeyPressed(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter")
+        {
+            await SaveIngredient();
+        }
     }
 }

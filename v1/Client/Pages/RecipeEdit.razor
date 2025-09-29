@@ -14,7 +14,7 @@
             <!-- Recipe Name-->
             <div style="display: flex; justify-content:space-around; margin:1px;">
                 <input type="text"
-                style="width: 500px; height: 100px; text-align:center; border: 0px solid black; font-size: 30px; margin: 5px;field-sizing: content; wrap: hard;"
+                style="width: 500px; height: 100px; text-align:center; border: 0px solid black; font-size: 30px; margin: 5px;field-sizing: content; wrap: hard; box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);"
                 placeholder="Recipe Name" 
                 maxlength="50"
                 @bind-value="Model.RecipeName" />
@@ -27,7 +27,8 @@
                         border: 0px solid black;text-align:center; 
                         font-size: 15px; resize:none;
                         overflow:hidden; margin-bottom:5px;
-                        field-sizing: content; wrap: hard;"
+                        field-sizing: content; wrap: hard;
+                        box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);"
                 maxlength="255"                        
                 placeholder="Description" 
                 @bind="Model.RecipeDesc"
@@ -35,6 +36,7 @@
             </div>
             <br />
             <!-- Tags -->
+            <p style="display:flex; justify-content:space-around; color:grey">Press enter to add tag.</p>
             <div style="display:flex; justify-content:space-around;">
                 <input type="text"
                 class="w3-card"
@@ -52,12 +54,13 @@
                     {
                         foreach (RecipeTag tag in Model.RecipeTags)
                         {
-                            <sl-tag pill variant="primary" style="margin: 5px;" @onclick="()=>onTagClick(tag)">@tag.Tag</sl-tag>
+                            <sl-tag pill variant="primary" style="margin: 5px; cursor:pointer;" @onclick="()=>onTagClick(tag)" >@tag.Tag</sl-tag>
                         }
 
                     }
                 }
             </div>
+            <p style="display:flex; justify-content:space-around; color:grey">Click on a tag to edit.</p>
             <br />
 
             <div style="display: flex; justify-content:center; align-items:center;">
@@ -77,7 +80,7 @@
                         {
                             <sl-card @onclick="()=>{
                                 OnIngredientClick(i);
-                                }" class="auto" style="width: 400px; font-size:1.25vw; margin: 2px;">
+                                }" class="auto" style="width: 400px; font-size:1.25rem; margin: 2px;">
                                 @i.IngredientNameModifier @i.Ing.IngredientName - @i.Quantity @i.QuantityDesc
                             </sl-card>
                         }                       
@@ -99,10 +102,11 @@
                         <br />
                         <label>Ingredient Name:</label>
                         <BlazoredTypeahead  
-                        SearchMethod="SearchIngredients" 
-                        @bind-Value="selectedIngredient"
-                        AddItemOnEmptyResultMethod="AddIngredientLookUp" 
-                        placeholder="Type here to search or hit enter to add new ingredient"
+                            SearchMethod="SearchIngredients" 
+                            @bind-Value="selectedIngredient"
+                            AddItemOnEmptyResultMethod="AddIngredientLookUp" 
+                            @onblur="()=>AddIngredientLookUp()"
+                            placeholder="Type here to search or hit enter to add new ingredient"
                         >
                             <SelectedTemplate>
                                 @if (context != null)
@@ -136,7 +140,7 @@
                         <input id="IAmountDesc" style="width: 100%; height: 37px; border:1px solid #bfbfbf; border-radius:5px; text-indent:5px;"
                         @bind-value="ingredient.QuantityDesc" placeholder="ex: grams, ml etc" @onkeyup="IngredientEnterKeyPressed" />
                         <hr />
-                        <sl-card class="auto" style="font-size:1.05vw; margin: 2px;">
+                        <sl-card class="auto" style="font-size:1.05rem; margin: 2px;">
                             <label slot="header">Preview</label>
                             @(ingredient.IngredientNameModifier == "" ? "[]" : ingredient.IngredientNameModifier) @(selectedIngredient == null ? "[IngredientName]" : selectedIngredient.IngredientName) - @(ingredient.Quantity == 0 ? "[#]" : ingredient.Quantity) @(ingredient.QuantityDesc == "" ? "[grams (optional)]" : ingredient.QuantityDesc)
                         </sl-card>
@@ -157,13 +161,14 @@
             </div>
             <br />
             <!-- List of Instructions -->
+            <p style="display:flex; justify-content:space-around; color:grey">Click on an instruction to edit.</p>
             <div style="display:flex; flex-direction: column; align-content:center; flex-wrap:wrap;">
                 @{
                     int stepIndex = 1;
                     foreach (RecipeStep s in Model.RecipeSteps)
                     {
                         <sl-card class="auto" @onclick="()=>{ onStepClick(s);}"
-                        style="width: 400px; font-size:15px; margin:2px; word-break:break-word;">
+                        style="width: 400px; font-size:15px; margin:2px; word-break:break-word; cursor:pointer;">
                             #@stepIndex @s.Step
                         </sl-card>
                         stepIndex++;
@@ -171,19 +176,22 @@
                 }
 
                 <div>
-                    <textarea class="w3-card" style="width: 400px;
-                        border: 0px solid black;text-align:left; text-indent:15px;
+                    <textarea class="w3-card" style="width: 360px; height:60px;
+                        border: 0px solid black; text-indent:15px;
                         font-size: 15px; resize:none; border-radius: 5px;
                         overflow:hidden; margin-bottom:5px;
-                        field-sizing: content; wrap: hard;"
+                        field-sizing: content; wrap: hard; text-align:left; 
+                        vertical-align:middle; padding-top:18px"
                     placeholder="#@(stepIndex.ToString()) Step"
                     @onkeyup="StepEnterKeyPressed"
                     @bind="step.Step" 
                     @bind:event="oninput"
                     />
+                    <sl-button style="height:60px; width:40px; padding-right:2px;" @onclick="()=>{AddStep();}">Add</sl-button>
                 </div>                    
 
             </div>
+            <p style="display:flex; justify-content:space-around; color:grey">Press enter to add the instruction.</p>
 
             <br />
             <br />
@@ -467,10 +475,14 @@
 
     private async Task<Ingredient> AddIngredientLookUp(string searchText)
     {
-        Ingredient i = await RecipeService.CreateIngredient(new Ingredient { IngredientName = searchText, Id=0 });
-        selectedIngredient = i;
-        ingredient.Ing.IngredientName = i.IngredientName;
-        StateHasChanged();
-        return i;
+        if (!String.IsNullOrEmpty(searchText))
+        {
+            Ingredient i = await RecipeService.CreateIngredient(new Ingredient { IngredientName = searchText, Id=0 });
+            selectedIngredient = i;
+            ingredient.Ing.IngredientName = i.IngredientName;
+            StateHasChanged();
+            return i;
+        }
+        return null;
     }
 }

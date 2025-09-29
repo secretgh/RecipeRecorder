@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components.Web.Virtualization;
 using RecipeRecorder.Shared;
+using System.Drawing.Printing;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using static System.Net.WebRequestMethods;
 
@@ -35,7 +37,6 @@ namespace RecipeRecorder.Client.Service
         private readonly HttpClient _httpClient;
         private HashSet<int> expandedIngredients;
         private Dictionary<int, List<Recipe>> ingredientRecipes;
-
 
         public RecipeService(HttpClient client) { 
             _httpClient = client;
@@ -98,13 +99,27 @@ namespace RecipeRecorder.Client.Service
             int pageNumber = (request.StartIndex / request.Count) + 1;
             int pageSize = request.Count;
 
-            var response = await _httpClient.GetFromJsonAsync<PagedResult<Ingredient>>(
-                $"api/recipe/ingredients/page/{pageNumber}/{pageSize}"
-            );
+            //var response = await _httpClient.GetFromJsonAsync<PagedResult<Ingredient>>(
+            //    $"api/recipe/ingredients/page/{pageNumber}/{pageSize}"
+            //);
 
-            return new ItemsProviderResult<Ingredient>(
-                response!.Items, response.TotalCount
-            );
+            //return new ItemsProviderResult<Ingredient>(
+            //    response!.Items, response.TotalCount
+            //);
+
+            var response = await _httpClient.GetAsync($"api/recipe/ingredients/page/{pageNumber}/{pageSize}");
+            var body = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Server returned {response.StatusCode}: {body}");
+                throw new Exception(body);
+            }
+
+            var result = JsonSerializer.Deserialize<PagedResult<Ingredient>>(body,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            return new ItemsProviderResult<Ingredient>(result!.Items, result.TotalCount);
         }
 
         public HashSet<int> GetExpandedIngredients()

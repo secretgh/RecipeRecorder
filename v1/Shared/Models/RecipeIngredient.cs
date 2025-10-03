@@ -27,5 +27,6 @@ public partial class RecipeIngredient
     [Unicode(false)]
     public string? QuantityDesc { get; set; }
 
+    [ForeignKey(nameof(IngId))]
     public Ingredient Ing { get; set; } 
 }

@@ -56,7 +56,10 @@ public partial class DevContext : DbContext
         modelBuilder.Entity<RecipeIngredient>(entity =>
         {
             entity.HasKey(e => new { e.IngId, e.RecipeId });
-            entity.Ignore(e => e.Ing);
+            entity.HasOne(e => e.Ing)
+                 .WithMany()
+                 .HasForeignKey(e => e.IngId);
+
            /* entity.HasOne(e => e.Recipe)
                   .WithMany(e => e.RecipeIngredients)
                   .HasForeignKey(e=>e.RecipeId)

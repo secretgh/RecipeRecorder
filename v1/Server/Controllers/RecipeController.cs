@@ -245,28 +245,7 @@ namespace RecipeRecorder.Server.Controllers
         {
             Console.WriteLine("Create Recipe End Point Hit!");
 
-            using (SqlConnection con = new SqlConnection(_config.GetConnectionString("local")))
-            {
-                con.Open();
-                SqlCommand createRecipe = new SqlCommand("CreateRecipe", con);
-                createRecipe.CommandType = System.Data.CommandType.StoredProcedure;
-                try
-                {
-                    //recipe table
-                    createRecipe.Parameters.AddRange(new SqlParameter[]{
-                        new SqlParameter("@name", r.RecipeName),
-                        new SqlParameter("@desc", r.RecipeDesc)
-                    });
-
-                    r.Id = int.Parse(createRecipe.ExecuteScalar().ToString());
-                    con.Close();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    return BadRequest();
-                }
-            }
+            await _context.Recipes.AddAsync(r);
 
             foreach (RecipeTag t in r.RecipeTags)
             {
@@ -286,6 +265,7 @@ namespace RecipeRecorder.Server.Controllers
             {
 
                 i.RecipeId = r.Id;
+                _context.Entry(i.Ing).State = EntityState.Unchanged;
                 await _context.RecipeIngredients.AddAsync(i);
             }
 
@@ -297,53 +277,77 @@ namespace RecipeRecorder.Server.Controllers
         public async Task<IActionResult> UpdateRecipe(Recipe r)
         {
 
-            if(r == null)
+            var existingRecipe = await _context.Recipes
+                                        .Include(rec => rec.RecipeTags)
+                                        .Include(rec => rec.RecipeIngredients)
+                                        .ThenInclude(ri => ri.Ing)
+                                        .Include(rec => rec.RecipeSteps)
+                                        .FirstOrDefaultAsync(rec => rec.Id == r.Id);
+
+            if (existingRecipe is null)
+                return NotFound();
+
+            // Update scalar properties
+            _context.Entry(existingRecipe).CurrentValues.SetValues(r);
+
+            // ---------------------------
+            // Update Ingredients
+            // ---------------------------
+            existingRecipe.RecipeIngredients.Clear();
+
+            foreach (var ri in r.RecipeIngredients)
             {
-                return BadRequest(r);
-            }
-            else
-            {
-                _context.Recipes.Update(r);
-            }
-            foreach (RecipeTag t in r.RecipeTags)
-            {
-                if (!_context.RecipeTags.Any(tag => tag.Id == t.Id))
-                { 
-                    await _context.RecipeTags.AddAsync(t);            
-                }
-                else
+                var newRi = new RecipeIngredient
                 {
-                    _context.RecipeTags.Update(t);
+                    RecipeId = existingRecipe.Id,
+                    IngId = ri.IngId,  // <-- IMPORTANT: use FK, not the Ing object
+                    IngredientNameModifier = ri.IngredientNameModifier,
+                    Quantity = ri.Quantity,
+                    QuantityDesc = ri.QuantityDesc
+                };
+
+                // Only attach Ingredient if needed
+                if (ri.Ing != null && ri.Ing.Id != 0)
+                {
+                    // Tell EF it's an existing Ingredient
+                    _context.Attach(ri.Ing);
+                    newRi.Ing = ri.Ing;
                 }
+
+                existingRecipe.RecipeIngredients.Add(newRi);
             }
 
-            //step table
-            foreach (RecipeStep s in r.RecipeSteps)
+            // ---------------------------
+            // Update Tags
+            // ---------------------------
+            existingRecipe.RecipeTags.Clear();
+            foreach (var tag in r.RecipeTags)
             {
-                if (!_context.RecipeSteps.Any(step => step.Id == s.Id))
-                { 
-                    await _context.RecipeSteps.AddAsync(s);
-                }   
-                else
+                existingRecipe.RecipeTags.Add(new RecipeTag
                 {
-                    _context.RecipeSteps.Update(s);
-                }
+                    Id = tag.Id,
+                    RecipeId = existingRecipe.Id,
+                    Tag = tag.Tag
+                });
             }
 
-            //RecipeIngredient table
-            foreach (RecipeIngredient i in r.RecipeIngredients)
+            // ---------------------------
+            // Update Steps
+            // ---------------------------
+            existingRecipe.RecipeSteps.Clear();
+            foreach (var step in r.RecipeSteps)
             {
-                if (!_context.RecipeIngredients.Any(ri => ri.IngId == i.IngId && ri.RecipeId == r.Id)) { 
-                    await _context.RecipeIngredients.AddAsync(i);                
-                }
-                else
+                existingRecipe.RecipeSteps.Add(new RecipeStep
                 {
-                    _context.RecipeIngredients.Update(i);
-                }
+                    Id = step.Id,
+                    RecipeId = existingRecipe.Id,
+                    Step = step.Step,
+                    SubText = step.SubText
+                });
             }
 
             await _context.SaveChangesAsync();
-            return Ok();
+            return Ok(existingRecipe);
         }
 
         [HttpGet("{rid}/tags")]

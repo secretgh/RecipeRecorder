@@ -23,6 +23,7 @@ namespace RecipeRecorder.Client.Service
         HashSet<int> GetExpandedIngredients();
         ValueTask<ItemsProviderResult<Ingredient>> LoadIngredients(ItemsProviderRequest request);
         Task<List<Recipe>> GetRecipesUsingIngredientAsync(int ingredientId);
+        Task LoadIngredientRecipes();
         Task AddIngredientAsync(Ingredient ingredient);
         Task UpdateIngredientAsync(Ingredient ingredient);
         Task DeleteIngredientAsync(int id);
@@ -151,6 +152,19 @@ namespace RecipeRecorder.Client.Service
                     if (recipes != null)
                         ingredientRecipes[ingredientId] = recipes;
                 }
+            }
+        }
+
+        public async Task LoadIngredientRecipes()
+        {
+            List<Ingredient> ings = await _httpClient.GetFromJsonAsync<List<Ingredient>>($"api/recipe/ingredients");
+            if(ings != null)
+            {
+                foreach(Ingredient i in ings)
+                {
+                    await ExpandIngredientRecipes(i.Id);
+                }
+                expandedIngredients.Clear();
             }
         }
 

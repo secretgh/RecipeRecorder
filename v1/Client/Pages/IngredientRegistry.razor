@@ -25,7 +25,10 @@
                 <small>@(IngredientService.GetExpandedIngredients().Contains(ingredient.Id) ? "Hide Recipes" : "Related Recipes")</small>
             </sl-button>
             <sl-button @onclick="() => EditIngredient(ingredient)">Edit</sl-button>
-            <sl-button @onclick="() => DeleteIngredient(ingredient.Id)">Delete</sl-button>
+            @if (asyncToggle)
+            {
+                <sl-button @onclick="() => DeleteIngredient(ingredient.Id)" disabled="@CheckIfLinked(ingredient.Id)">Delete</sl-button>
+            }
 
             @if (IngredientService.GetExpandedIngredients().Contains(ingredient.Id))
             {
@@ -48,6 +51,7 @@
                     <p><em>Loading recipes...</em></p>
                 }
             }
+
         </sl-card>
     </div>
 </Virtualize>
@@ -56,6 +60,34 @@
     private string NewIngredientName = string.Empty;
     private int? EditingIngredientId = null;
     int refreshCounter = 0;
+
+    bool asyncToggle = false;
+    Dictionary<int, List<Recipe>> ingredientRecipes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateAllIngredients();
+        ingredientRecipes = IngredientService.GetIngredientRecipes();
+        asyncToggle = true;
+        StateHasChanged();
+    }
+
+    private async Task UpdateAllIngredients()
+    {
+        await IngredientService.LoadIngredientRecipes();
+    }
+
+    bool CheckIfLinked(int id)
+    {
+        if (ingredientRecipes.ContainsKey(id))
+        {
+            return ingredientRecipes[id].Count > 0;
+        }
+        else
+        {
+            return true;
+        }
+    }
 
     private async Task ToggleRecipesAsync(int ingredientId)
     {

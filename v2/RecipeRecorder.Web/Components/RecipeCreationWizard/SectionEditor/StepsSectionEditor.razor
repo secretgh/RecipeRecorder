@@ -1,0 +1,53 @@
+﻿@* StepsStructuredEditor.razor *@
+<div class="steps-structured-editor">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-list-ol me-2"></i>Recipe Steps</h4>
+        <small class="text-muted">@WizardSteps.Count steps</small>
+    </div>
+
+    <div class="alert alert-info mb-3">
+        <i class="bi bi-info-circle me-2"></i>
+        Your steps have been parsed for ingredients and timing. You can refine the instructions here.
+    </div>
+
+
+    @foreach (var step in WizardSteps)
+    {
+        <div class="step-structured-item mb-4 p-3 border rounded">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6>Step @step.StepNumber</h6>
+                @if (step.ParsedData != null && (step.ParsedData.Ingredients.Any() || step.ParsedData.Times.Any()))
+                {
+                    <div class="parsed-elements-mini">
+                        @if (step.ParsedData.Ingredients.Any())
+                        {
+                            @foreach (var ingredient in step.ParsedData.Ingredients)
+                            {
+                                <span class="badge bg-success me-1">@ingredient.Replace("#", "")</span>
+                            }
+                        }
+                        @if (step.ParsedData.Times.Any())
+                        {
+                            @foreach (var time in step.ParsedData.Times)
+                            {
+                                <span class="badge bg-info me-1">@time.Replace("@", "")</span>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+            <textarea class="form-control" rows="3" @bind="step.Text" @onblur="() => OnStepTextChanged()"
+                placeholder="Step @step.StepNumber instructions...">
+            </textarea>
+        </div>
+    }
+</div>
+@code
+{
+    [Parameter] public List<StepWizardData> WizardSteps { get; set; } = new();
+    [Parameter] public EventCallback<List<StepWizardData>> WizardStepsChanged { get; set; }
+    private async Task OnStepTextChanged()
+    {
+        await WizardStepsChanged.InvokeAsync(WizardSteps);
+    }
+}

@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.Web", "v2\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.Maui", "v2\RecipeRecorder.Maui\RecipeRecorder.Maui.csproj", "{6210D019-A2C6-22E3-7433-656DCF6F205C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.SharedComponents", "RecipeRecorder.SharedComponents\RecipeRecorder.SharedComponents.csproj", "{EC2C61DA-F300-42AF-B974-22F83A96F782}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,8 +87,13 @@ Global
 		{370B3062-F5AA-7864-3FDD-0EFD813FFF02}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6210D019-A2C6-22E3-7433-656DCF6F205C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6210D019-A2C6-22E3-7433-656DCF6F205C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6210D019-A2C6-22E3-7433-656DCF6F205C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{6210D019-A2C6-22E3-7433-656DCF6F205C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6210D019-A2C6-22E3-7433-656DCF6F205C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC2C61DA-F300-42AF-B974-22F83A96F782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC2C61DA-F300-42AF-B974-22F83A96F782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC2C61DA-F300-42AF-B974-22F83A96F782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC2C61DA-F300-42AF-B974-22F83A96F782}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +116,7 @@ Global
 		{50AEC27C-9FA9-4FD9-D329-A9D8D5738AC4} = {0E36E71C-0CBD-4646-A5DD-76ADE81F4F4C}
 		{370B3062-F5AA-7864-3FDD-0EFD813FFF02} = {97EAA1C4-D38E-46DB-BCB2-C6CF5974A635}
 		{6210D019-A2C6-22E3-7433-656DCF6F205C} = {FCE17639-AB02-4BA2-955E-ED7A532C0925}
+		{EC2C61DA-F300-42AF-B974-22F83A96F782} = {D6F9170E-1901-4EFF-AF3C-D05777D6EBB0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {60211662-39EF-4201-B29E-4AB9F508F16F}

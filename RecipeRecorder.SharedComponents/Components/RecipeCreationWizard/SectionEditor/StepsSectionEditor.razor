@@ -23,14 +23,14 @@
                         {
                             @foreach (var ingredient in step.ParsedData.Ingredients)
                             {
-                                <span class="badge bg-success me-1">#@ingredient</span>
+                                <span class="badge bg-success me-1">@ingredient.Replace("#", "")</span>
                             }
                         }
                         @if (step.ParsedData.Times.Any())
                         {
                             @foreach (var time in step.ParsedData.Times)
                             {
-                                <span class="badge bg-info me-1">@@ @time</span>
+                                <span class="badge bg-info me-1">@time.Replace("@", "")</span>
                             }
                         }
                     </div>
@@ -44,8 +44,8 @@
 </div>
 @code
 {
-    [Parameter] public List<RecipeStepWizardData> WizardSteps { get; set; } = new();
-    [Parameter] public EventCallback<List<RecipeStepWizardData>> WizardStepsChanged { get; set; }
+    [Parameter] public List<StepWizardData> WizardSteps { get; set; } = new();
+    [Parameter] public EventCallback<List<StepWizardData>> WizardStepsChanged { get; set; }
     private async Task OnStepTextChanged()
     {
         await WizardStepsChanged.InvokeAsync(WizardSteps);

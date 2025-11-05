@@ -1,0 +1,27 @@
+﻿@using RecipeRecorder.Web.Layout
+@inject NavigationManager nav;
+
+@code
+{
+    [Parameter] public List<TabItem> Tabs { get; set; } = new ();
+    private TabItem? activeTab = null;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        activeTab = Tabs.Where(tab => (nav.BaseUri + tab.URL).Equals(nav.Uri)).FirstOrDefault();
+    }
+    private void SelectTab(TabItem tab)
+    {
+        activeTab = tab;
+        nav.NavigateTo(tab.URL);
+    }
+}
+<div class="tab-nav">
+    @foreach(TabItem tab in Tabs.Where(t => t.Visible))
+    {
+        <div class="tab @(activeTab == tab ? "active" : "")" @onclick="()=> SelectTab(tab)">
+            @tab.Label
+        </div>
+    }
+</div>

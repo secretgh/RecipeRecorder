@@ -1,18 +1,18 @@
-﻿@inherits LayoutComponentBase
-@inject NavigationManager nav
+﻿@using RecipeRecorder.Web.Components.TabNavigation
+@inherits LayoutComponentBase
 
-<div style="display:flex; flex-direction:row;">
-    <button class="btn btn-outline-primary" @onclick="@(() => Navigate(""))">Home</button>
-    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/recipes"))">Recipes</button>
-    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/collections"))">Collections</button>
-    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/ingredients"))">Ingredients</button>
-    <button class="btn btn-outline-primary" @onclick="@(() => Navigate("/config"))">Config</button>
+<TabNav Tabs="menuTabs" />
+<div style="padding: 10px;">
+    @Body
 </div>
-@Body
 
 @code {
-    private void Navigate(string uri)
+    private List<TabItem> menuTabs = new()
     {
-        nav.NavigateTo(uri);
-    }
+        new TabItem { Label="Home", URL="" },
+        new TabItem { Label="Recipes", URL="/recipes" },
+        new TabItem { Label="Collections", URL="/collections" },
+        new TabItem { Label="Ingredients", URL="/ingredients" },
+        new TabItem { Label="Config", URL="/config" }
+    };
 }

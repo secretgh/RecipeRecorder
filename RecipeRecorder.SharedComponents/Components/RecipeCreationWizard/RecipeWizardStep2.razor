@@ -81,15 +81,15 @@
             <div class="section-edit-panel h-100">
                 @if (selectedSection == "description")
                 {
-                    <DescriptionEditor Description="@RecipeData.Description" DescriptionChanged="@OnDescriptionChanged" RecipeTags="@RecipeData.Recipe.Tags" RecipeTagsChanged="@OnRecipeTagsChanged" />
+                    <DescriptionSectionEditor Description="@RecipeData.Description" DescriptionChanged="@OnDescriptionChanged" RecipeTags="@RecipeData.Recipe.Tags" RecipeTagsChanged="@OnRecipeTagsChanged" />
                 }
                 else if (selectedSection == "steps")
                 {
-                    <StepsStructuredEditor WizardSteps="@RecipeData.WizardSteps" WizardStepsChanged="@OnWizardStepsChanged" />
+                    <StepsSectionEditor WizardSteps="@RecipeData.WizardSteps" WizardStepsChanged="@OnWizardStepsChanged" />
                 }
                 else if (selectedSection == "ingredients")
                 {
-                    <IngredientsEditor ParsedIngredients="@allParsedIngredients" RecipeIngredients="@RecipeData.Recipe.Ingredients" RecipeIngredientsChanged="@OnRecipeIngredientsChanged" />
+                    <IngredientSectionEditor ParsedIngredients="@allParsedIngredients" RecipeIngredients="@RecipeData.Recipe.Ingredients" RecipeIngredientsChanged="@OnRecipeIngredientsChanged" />
                 }
             </div>
         </div>
@@ -123,7 +123,7 @@
         await RecipeDataChanged.InvokeAsync(RecipeData);    
     }    
 
-    private async Task OnWizardStepsChanged(List<RecipeStepWizardData> wizardSteps)    {
+    private async Task OnWizardStepsChanged(List<StepWizardData> wizardSteps)    {
         RecipeData.WizardSteps = wizardSteps;
         UpdateParsedIngredients();
         RecipeData.Recipe.Steps = RecipeData.ConvertStepsToDto();

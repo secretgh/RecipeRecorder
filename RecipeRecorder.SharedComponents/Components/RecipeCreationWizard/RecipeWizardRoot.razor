@@ -2,18 +2,7 @@
 @using RecipeRecorder.Web.Components.RecipeCreationWizard.SectionEditor
 @inject NavigationManager nav
 <div class="recipe-creation-wizard">
-    <div class="wizard-header mb-4">
-        <div class="progress mb-3">
-            <div class="progress-bar" 
-                 role="progressbar" 
-                 style="width: @(((float)currentStep / totalSteps) * 100)%"
-                 aria-valuenow="@currentStep" 
-                 aria-valuemin="0" 
-                 aria-valuemax="@totalSteps">
-                Step @currentStep of @totalSteps
-            </div>
-        </div>
-        
+    <div class="wizard-header mb-4">       
         <nav aria-label="Recipe creation steps">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item @(currentStep == 1 ? "active" : "")">
@@ -26,9 +15,12 @@
                         <span>Basic Info & Steps</span>
                     }
                 </li>
-                <li class="breadcrumb-item @(currentStep == 2 ? "active" : "")">
-                    <span>Refine Recipe</span>
-                </li>
+                @if (currentStep > 1)
+                {
+                    <li class="breadcrumb-item @(currentStep == 2 ? "active" : "")">
+                        <span>Refine Recipe</span>
+                    </li>
+                }
             </ol>        
         </nav>    
     </div>    
@@ -39,12 +31,12 @@
                     <label for="recipeName" class="form-label">Recipe Name</label>
                     <input type="text" id="recipeName" class="form-control" @bind="recipeData.Name" placeholder="Enter recipe name" maxlength="200" />  
                 </div>
-                <RecipeStepsEditor Steps="@recipeData.WizardSteps" StepsChanged="@OnStepsChanged" />     
+                <RecipeWizardStep1 Steps="@recipeData.WizardSteps" StepsChanged="@OnStepsChanged" />     
             </div>        
             }        
         else if (currentStep == 2){            
             <div class="step-2">                
-                <RecipeSectionEditor RecipeData="@recipeData" RecipeDataChanged="@OnRecipeDataChanged" />    
+                <RecipeWizardStep2 RecipeData="@recipeData" RecipeDataChanged="@OnRecipeDataChanged" />    
             </div>        
         }    
     </div>    
@@ -70,7 +62,7 @@
     private int currentStep = 1;    
     private const int totalSteps = 2;    
     private RecipeWizardData recipeData = new();    
-    private void OnStepsChanged(List<RecipeStepWizardData> steps)    {        
+    private void OnStepsChanged(List<StepWizardData> steps)    {        
         recipeData.WizardSteps = steps;    
     }    
     private void OnRecipeDataChanged(RecipeWizardData updatedData)    {        

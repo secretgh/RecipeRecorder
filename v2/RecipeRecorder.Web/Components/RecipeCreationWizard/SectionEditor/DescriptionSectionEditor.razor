@@ -1,0 +1,189 @@
+﻿@using RecipeRecorder.Shared.DTOs
+@* DescriptionEditor.razor *@
+<div class="description-editor">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-card-text me-2"></i>Recipe Description & Tags</h4>
+    </div>
+
+    <div class="mb-4">
+        <label for="recipeDescription" class="form-label">
+            Describe your recipe <span class="text-muted">*</span>
+        </label>
+        <textarea id="recipeDescription"
+                  class="form-control" 
+                  rows="6"
+                  @bind="description"
+                  @oninput="OnDescriptionInput"
+                  placeholder="Tell people about your recipe. What makes it special? Any tips or background?">
+        </textarea>
+        <div class="form-text">
+            @if (description.Length > 0)
+            {
+                <span>@description.Length characters</span>
+            }
+        </div>
+    </div>
+
+    <!-- Recipe Tags Section -->
+    <div class="mb-4">
+        <label class="form-label">
+            Recipe Tags <span class="text-muted">(optional)</span>
+        </label>
+        
+        <!-- Tag Input -->
+        <div class="input-group mb-2">
+            <input type="text" 
+                   class="form-control" 
+                   @bind="newTag"
+                   @onkeypress="OnTagKeyPress"
+                   placeholder="Add a tag (e.g., vegetarian, quick, dessert)"
+                   maxlength="50" />
+            <button type="button" 
+                    class="btn btn-outline-primary" 
+                    @onclick="AddTag"
+                    disabled="@(string.IsNullOrWhiteSpace(newTag))">
+                <i class="bi bi-plus me-1"></i>Add
+            </button>
+        </div>
+
+        <!-- Current Tags -->
+        @if (recipeTags.Any())
+        {
+            <div class="tags-container">
+                <div class="d-flex flex-wrap gap-1">
+                    @foreach (var tag in recipeTags)
+                    {
+                        <span class="badge bg-secondary d-inline-flex align-items-center">
+                            @tag.Tag
+                            <button type="button" 
+                                    class="btn-close btn-close-white ms-2" 
+                                    aria-label="Remove tag"
+                                    @onclick="() => RemoveTag(tag)"
+                                    style="font-size: 0.6em;">
+                            </button>
+                        </span>
+                    }
+                </div>
+                <small class="text-muted mt-1 d-block">@recipeTags.Count tag(s) added</small>
+            </div>
+        }
+        else
+        {
+            <small class="text-muted">No tags added yet. Tags help categorize your recipe.</small>
+        }
+
+        <!-- Common Tags Suggestions -->
+        @if (commonTags.Any(ct => !recipeTags.Any(rt => string.Equals(rt.Tag, ct, StringComparison.OrdinalIgnoreCase))))
+        {
+            <div class="mt-2">
+                <small class="text-muted d-block mb-1">Suggested tags:</small>
+                <div class="d-flex flex-wrap gap-1">
+                    @foreach (var commonTag in commonTags.Where(ct => !recipeTags.Any(rt => string.Equals(rt.Tag, ct, StringComparison.OrdinalIgnoreCase))).Take(8))
+                    {
+                        <button type="button" 
+                                class="btn btn-outline-secondary btn-sm" 
+                                @onclick="() => AddSuggestedTag(commonTag)">
+                            @commonTag
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="alert alert-info">
+        <i class="bi bi-lightbulb me-2"></i>
+        <strong>Tips:</strong> Include details like cuisine type, difficulty level, or what occasions this recipe is perfect for. Use tags to help others find your recipe!
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Description { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> DescriptionChanged { get; set; }
+    [Parameter] public List<RecipeTagDto> RecipeTags { get; set; } = new();
+    [Parameter] public EventCallback<List<RecipeTagDto>> RecipeTagsChanged { get; set; }
+
+    private string description = string.Empty;
+    private string newTag = string.Empty;
+    private List<RecipeTagDto> recipeTags = new();
+    
+    private readonly List<string> commonTags = new()
+    {
+        "vegetarian", "vegan", "gluten-free", "dairy-free", "quick", "easy", 
+        "healthy", "comfort-food", "dessert", "breakfast", "lunch", "dinner", 
+        "appetizer", "snack", "italian", "mexican", "asian", "american",
+        "low-carb", "high-protein", "kid-friendly", "party", "holiday"
+    };
+
+    protected override void OnInitialized()
+    {
+        description = Description;
+        recipeTags = RecipeTags.ToList();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (description != Description)
+        {
+            description = Description;
+        }
+        
+        if (!recipeTags.SequenceEqual(RecipeTags))
+        {
+            recipeTags = RecipeTags.ToList();
+        }
+    }
+
+    private async Task OnDescriptionInput(ChangeEventArgs e)
+    {
+        description = e.Value?.ToString() ?? string.Empty;
+        await DescriptionChanged.InvokeAsync(description);
+    }
+
+    private async Task OnTagKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await AddTag();
+        }
+    }
+
+    private async Task AddTag()
+    {
+        if (string.IsNullOrWhiteSpace(newTag))
+            return;
+
+        var tagText = newTag.Trim().ToLowerInvariant();
+        
+        // Check if tag already exists
+        if (recipeTags.Any(t => string.Equals(t.Tag, tagText, StringComparison.OrdinalIgnoreCase)))
+            return;
+
+        var newTagDto = new RecipeTagDto
+        {
+            Id = 0, // Will be set when saved
+            RecipeId = 0, // Will be set when recipe is saved
+            Tag = tagText
+        };
+
+        recipeTags.Add(newTagDto);
+        newTag = string.Empty;
+        
+        await RecipeTagsChanged.InvokeAsync(recipeTags);
+        StateHasChanged();
+    }
+
+    private async Task AddSuggestedTag(string tagText)
+    {
+        newTag = tagText;
+        await AddTag();
+    }
+
+    private async Task RemoveTag(RecipeTagDto tag)
+    {
+        recipeTags.Remove(tag);
+        await RecipeTagsChanged.InvokeAsync(recipeTags);
+        StateHasChanged();
+    }
+}
+

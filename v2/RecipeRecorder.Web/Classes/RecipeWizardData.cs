@@ -4,12 +4,12 @@ using RecipeRecorder.Shared.DTOs;
 public class RecipeWizardData
 {
     public RecipeDto Recipe { get; set; } = new();
-    public List<RecipeStepWizardData> WizardSteps { get; set; } = new();
+    public List<StepWizardData> WizardSteps { get; set; } = new();
     
     public List<RecipeStepDto> ConvertStepsToDto()
     {
         List<RecipeStepDto> steps = new List<RecipeStepDto>();
-        foreach(RecipeStepWizardData data in WizardSteps)
+        foreach(StepWizardData data in WizardSteps)
         {
             steps.Add(data.ToDto(Recipe.Id));
         }
@@ -30,7 +30,7 @@ public class RecipeWizardData
     }
 }
 
-public class RecipeStepWizardData
+public class StepWizardData
 {
     public int StepNumber { get; set; }
     public string Text { get; set; } = string.Empty;

@@ -1,0 +1,142 @@
+﻿@using RecipeRecorder.Shared.DTOs
+@using RecipeRecorder.Web.Components.RecipeCreationWizard.SectionEditor
+@* RecipeSectionEditor.razor *@
+<div class="recipe-section-editor">
+    <div class="row h-100">
+        <!-- Left Panel: Recipe Preview -->
+        <div class="col-md-4 pe-3">
+            <div class="recipe-preview-panel bg-light p-3 rounded h-100">
+                <h5 class="mb-3">@RecipeData.Name</h5>
+                
+                <!-- Section Navigation -->
+                <div class="list-group">
+                    <button type="button" 
+                            class="list-group-item list-group-item-action @(selectedSection == "description" ? "active" : "")"
+                            @onclick="@(() => SelectSection("description"))">
+                        <i class="bi bi-card-text me-2"></i>
+                        <strong>Description</strong>
+                        @if (!string.IsNullOrWhiteSpace(RecipeData.Description)){
+                            <span class="badge bg-success ms-2">✓</span>
+                        }
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action @(selectedSection == "steps" ? "active" : "")" @onclick="@(() => SelectSection("steps"))">
+                        <i class="bi bi-list-ol me-2"></i>
+                        <strong>Steps</strong>
+                        <span class="badge bg-primary ms-2">@RecipeData.WizardSteps.Count</span>
+                    </button>
+                    <button type="button" class="list-group-item list-group-item-action @(selectedSection == "ingredients" ? "active" : "")" @onclick="@(() => SelectSection("ingredients"))">
+                        <i class="bi bi-basket me-2"></i>
+                        <strong>Ingredients</strong>
+                        <span class="badge bg-info ms-2">@allParsedIngredients.Count</span>
+                        @if (RecipeData.Recipe.Ingredients.Any())
+                        {
+                            <span class="badge bg-success ms-1">@RecipeData.Recipe.Ingredients.Count ✓</span>
+                        }
+                    </button>
+                </div>
+                <!-- Quick Preview -->
+                <div class="mt-4">
+                    @if (selectedSection == "description" && !string.IsNullOrWhiteSpace(RecipeData.Description)){
+                        <div class="small">
+                            <strong>Description Preview:</strong>
+                            <p class="text-muted mt-1">@(RecipeData.Description.Length > 100 ? RecipeData.Description.Substring(0, 100) + "..." : RecipeData.Description)</p>
+                        </div>
+                    }
+                    else if (selectedSection == "steps"){
+                        <div class="small">
+                            <strong>Steps Preview:</strong>
+                            @for (int i = 0; i < Math.Min(3, RecipeData.WizardSteps.Count); i++)
+                            {
+                                <div class="text-muted mt-1">
+                                    @(i + 1). @(RecipeData.WizardSteps[i].Text.Length > 50 ? RecipeData.WizardSteps[i].Text.Substring(0, 50) + "..." : RecipeData.WizardSteps[i].Text)
+                                </div>
+                            }
+                            @if (RecipeData.WizardSteps.Count > 3)
+                            {
+                                <div class="text-muted">...and @(RecipeData.WizardSteps.Count - 3) more</div>
+                            }
+                        </div>
+                    }
+                    else if (selectedSection == "ingredients" && allParsedIngredients.Any())
+                    {
+                        <div class="small">
+                            <strong>Detected Ingredients:</strong>
+                            <div class="mt-1">
+                                @foreach (var ingredient in allParsedIngredients.Take(5))
+                                {
+                                <span class="badge bg-success me-1 mb-1">#@ingredient</span>
+                                }
+                                @if (allParsedIngredients.Count > 5)
+                                {
+                                    <span class="text-muted">...+@(allParsedIngredients.Count - 5) more</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <!-- Right Panel: Section Editor -->
+        <div class="col-md-8">
+            <div class="section-edit-panel h-100">
+                @if (selectedSection == "description")
+                {
+                    <DescriptionSectionEditor Description="@RecipeData.Description" DescriptionChanged="@OnDescriptionChanged" RecipeTags="@RecipeData.Recipe.Tags" RecipeTagsChanged="@OnRecipeTagsChanged" />
+                }
+                else if (selectedSection == "steps")
+                {
+                    <StepsSectionEditor WizardSteps="@RecipeData.WizardSteps" WizardStepsChanged="@OnWizardStepsChanged" />
+                }
+                else if (selectedSection == "ingredients")
+                {
+                    <IngredientSectionEditor ParsedIngredients="@allParsedIngredients" RecipeIngredients="@RecipeData.Recipe.Ingredients" RecipeIngredientsChanged="@OnRecipeIngredientsChanged" />
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter] public RecipeWizardData RecipeData { get; set; } = new();
+    [Parameter] public EventCallback<RecipeWizardData> RecipeDataChanged { get; set; }
+    private string selectedSection = "description";
+    private List<string> allParsedIngredients = new();    
+
+    protected override void OnInitialized()    {        
+        UpdateParsedIngredients();    
+    }    
+
+    protected override void OnParametersSet()    {        
+        UpdateParsedIngredients();    
+    }    
+
+    private void UpdateParsedIngredients()    {
+        allParsedIngredients = RecipeData.WizardSteps.SelectMany(s => s.ParsedData?.Ingredients ?? new List<string>()).Distinct().ToList();    
+    }    
+
+    private void SelectSection(string section)    {
+        selectedSection = section;
+        StateHasChanged();    
+    }    
+
+    private async Task OnDescriptionChanged(string description){        
+        RecipeData.Description = description;        
+        await RecipeDataChanged.InvokeAsync(RecipeData);    
+    }    
+
+    private async Task OnWizardStepsChanged(List<StepWizardData> wizardSteps)    {
+        RecipeData.WizardSteps = wizardSteps;
+        UpdateParsedIngredients();
+        RecipeData.Recipe.Steps = RecipeData.ConvertStepsToDto();
+        await RecipeDataChanged.InvokeAsync(RecipeData);    
+    }    
+
+    private async Task OnRecipeIngredientsChanged(List<RecipeIngredientDto> ingredients)    {
+        RecipeData.Recipe.Ingredients = ingredients;
+        await RecipeDataChanged.InvokeAsync(RecipeData);    
+    }
+    private async Task OnRecipeTagsChanged(List<RecipeTagDto> tags)
+    {
+        RecipeData.Recipe.Tags = tags;
+        await RecipeDataChanged.InvokeAsync(RecipeData);
+    }
+}

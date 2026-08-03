@@ -1,5 +1,6 @@
-﻿@using RecipeRecorder.Web.Components.RecipeCreationWizard
-@using RecipeRecorder.Web.Components.RecipeCreationWizard.SectionEditor
+﻿@using RecipeRecorder.SharedComponents.Components.RecipeCreationWizard
+@using RecipeRecorder.SharedComponents.Components.RecipeCreationWizard.SectionEditor
+@using RecipeRecorder.Shared.Classes
 @inject NavigationManager nav
 <div class="recipe-creation-wizard">
     <div class="wizard-header mb-4">       
@@ -95,7 +96,10 @@
     }    
     private async Task SaveRecipe()    {        
         if (CanSaveRecipe())        
-        {            
+        {
+            // Flush all wizard state (steps, name, description) into
+            // recipeData.Recipe before handing it off to the parent page.
+            recipeData.SyncToRecipe();
             await OnRecipeSaved.InvokeAsync(recipeData);
             nav.NavigateTo("/recipes");
         }    

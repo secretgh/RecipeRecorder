@@ -12,7 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.18" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\v2\RecipeRecorder.Application\RecipeRecorder.Application.csproj" />
+    <ProjectReference Include="..\v2\RecipeRecorder.Shared\RecipeRecorder.Shared.csproj" />
   </ItemGroup>
 
 </Project>

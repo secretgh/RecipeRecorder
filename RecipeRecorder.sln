@@ -42,6 +42,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.Maui", "v2\RecipeRecorder.Maui\RecipeRecorder.Maui.csproj", "{6210D019-A2C6-22E3-7433-656DCF6F205C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeRecorder.SharedComponents", "RecipeRecorder.SharedComponents\RecipeRecorder.SharedComponents.csproj", "{EC2C61DA-F300-42AF-B974-22F83A96F782}"
+	ProjectSection(ProjectDependencies) = postProject
+		{283E7BF0-C561-FE9A-3ED9-05FD2286B445} = {283E7BF0-C561-FE9A-3ED9-05FD2286B445}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

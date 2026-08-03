@@ -1,8 +1,8 @@
 ﻿@using RecipeRecorder.Application.Interfaces
-@using RecipeRecorder.Web.Components.RecipeCreationWizard
+@using RecipeRecorder.SharedComponents.Components.RecipeCreationWizard
 @inject IRecipeService service
 @page "/recipes/create"
 <PageTitle>Create Recipe</PageTitle>
 <h3>Create Recipe Page (WIP)</h3>
-<RecipeCreationWizard OnRecipeSaved="(recipe)=>service.CreateAsync(recipe.Recipe)"/>
+<RecipeWizardRoot OnRecipeSaved="(recipe)=>service.CreateAsync(recipe.Recipe)"/>
 
